@@ -28,12 +28,8 @@ function initCannon() {
     var fieldMaterial = new CANNON.Material("fieldMaterial");
     var ballMaterial = new CANNON.Material("ballMaterial");
     var field_ball_cm = new CANNON.ContactMaterial(fieldMaterial, ballMaterial, {
-        friction: 0.4,
-        restitution: 0.3,
-        contactEquationStiffness: 1e8,
-        contactEquationRelaxation: 3,
-        frictionEquationStiffness: 1e8,
-        frictionEquationRegularizationTime: 3,
+        friction: 0.001,
+        restitution: 0.03
     });
     world.addContactMaterial(field_ball_cm);
 
@@ -46,21 +42,11 @@ function initCannon() {
     field.addShape(fieldShape, new CANNON.Vec3, quat);
     world.addBody(field);
 
-    
     let ballShape = new CANNON.Cylinder(25,25,10,16);
-    ball = new CANNON.Body({ mass: 100, position: new CANNON.Vec3(0,0,60), material: ballMaterial });
+    ball = new CANNON.Body({ mass: 1, position: new CANNON.Vec3(0,0,30), material: ballMaterial });
     ball.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
     ball.addShape(ballShape, new CANNON.Vec3, quat);
     world.addBody(ball);
-    
-    // var q = new CANNON.Quaternion();
-    // q.setFromAxisAngle(new CANNON.Vec3(1,0,0),Math.PI / 2);
-    // cylinderShape2.transformAllPoints(new CANNON.Vec3(),q);
-
-    // var groundShape = new CANNON.Plane();
-    // var groundBody = new CANNON.Body({ mass: 0, shape: groundShape });
-    // groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-    // world.addBody(groundBody);
 
 }
 
@@ -69,28 +55,28 @@ function initThree() {
     scene = new Scene();
 
     let fieldCol = new MeshPhongMaterial({ color: "#00ff00", shininess: 0 });
-    let fieldGeo = new CylinderBufferGeometry(250,250,30, 64);
+    let fieldGeo = new CylinderBufferGeometry(250,250,30,64);
     fieldMesh = new Mesh( fieldGeo, fieldCol );
     fieldMesh.rotation.set(0,0,0);
     scene.add(fieldMesh);
 
-    // let playerCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
-    // let playerGeo = new TorusBufferGeometry(250, 10, 6, 6, Math.PI/6);
-    // player = new Mesh( playerGeo, playerCol );
-    // player.position.set(0,0,0);
-    // player.rotation.set(0,0,0);
-    // scene.add(player);
+    let playerCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
+    let playerGeo = new TorusBufferGeometry(250, 10, 6, 6, Math.PI/6);
+    player = new Mesh( playerGeo, playerCol );
+    player.position.set(0,0,20);
+    player.rotation.set(0,0,0);
+    scene.add(player);
 
     let ballCol = new MeshPhongMaterial({ color: "#0000ff", shininess: 0 });
     let ballGeo = new CylinderBufferGeometry(25,25,10,16);
     ballMesh = new Mesh( ballGeo, ballCol );
     scene.add(ballMesh);
-    
+
     camera = new PerspectiveCamera( 70, 800/600, 1, 5000 );
     //camera = new OrthographicCamera( -480, 480, 320, -320, -400, 400 );
     camera.position.x = 0;
     camera.position.y = -450;
-    camera.position.z = 250;
+    camera.position.z = 500;
 
     camera.lookAt(fieldMesh.position);
 
@@ -112,6 +98,7 @@ function initThree() {
 }
 
 function animate() {
+    player.rotation.z += 0.025;
     updatePhysics();
     render();
     requestAnimationFrame( animate );
@@ -128,6 +115,12 @@ function updatePhysics() {
 function render() {
     renderer.render( scene, camera );
 }
+
+setTimeout(function(){
+    var worldPoint = new CANNON.Vec3(0,0,0);
+    var force = new CANNON.Vec3(0,2000,0);
+    ball.applyForce(force,worldPoint);
+}, 2000);
 
 initCannon();
 initThree();
