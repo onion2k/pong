@@ -18,6 +18,7 @@ import { Object3D } from '../node_modules/three/src/core/Object3D';
 
 let world, scene, renderer, camera, player, field, fieldMesh, ball, ballMesh;
 var timeStep = 1/60;
+let walls = [];
 
 function init() {
 
@@ -74,7 +75,6 @@ function init() {
     scene.add(ballMesh);
 
     let sides = 3;
-    let walls = [];
     let wallCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
     let wallGeo = new BoxBufferGeometry(200,10,30);
     let wallShape = new CANNON.Box(new CANNON.Vec3(100,5,15));
@@ -83,11 +83,11 @@ function init() {
 
         //rotate then move along body axis
 
-        var wallPhys = new CANNON.Body({ mass: 0, position:new CANNON.Vec3(0,0,30), material: wallMaterial });
+        var wallPhys = new CANNON.Body({ mass: 1, position:new CANNON.Vec3(0,100*x,40), material: wallMaterial });
         wallPhys.quaternion.setFromAxisAngle(new CANNON.Vec3(0,0,1),((2*Math.PI)/sides)*x);
 
-        var d = new CANNON.Vec3(0,20,0);
-        wallPhys.position.mult(d);
+        // var impulse = new CANNON.Vec3(0,50,0);
+        // wallPhys.applyImpulse(impulse,wallPhys.position);
 
         wallPhys.addShape(wallShape);
         world.addBody(wallPhys);
@@ -148,6 +148,11 @@ function updatePhysics() {
     fieldMesh.quaternion.copy(field.quaternion);
     ballMesh.position.copy(ball.position);
     ballMesh.quaternion.copy(ball.quaternion);
+
+    walls.forEach((wall)=>{
+        wall.mesh.position.copy(wall.phys.position);
+        wall.mesh.quaternion.copy(wall.phys.quaternion);
+    });
 }
 
 function render() {
