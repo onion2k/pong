@@ -81,9 +81,14 @@ function init() {
     
     for (var x=0; x<sides;x++) {
 
+        //rotate then move along body axis
+
         var wallPhys = new CANNON.Body({ mass: 0, position:new CANNON.Vec3(0,0,30), material: wallMaterial });
         wallPhys.quaternion.setFromAxisAngle(new CANNON.Vec3(0,0,1),((2*Math.PI)/sides)*x);
-        wallPhys.position.vadd(new CANNON.Vec3(0,100,0), wallPhys.position);
+
+        var d = new CANNON.Vec3(0,20,0);
+        wallPhys.position.mult(d);
+
         wallPhys.addShape(wallShape);
         world.addBody(wallPhys);
     
