@@ -73,30 +73,29 @@ function init() {
     ballMesh = new Mesh( ballGeo, ballCol );
     scene.add(ballMesh);
 
-
-
-    let wallShape = new CANNON.Box(new CANNON.Vec3(100,5,15));
-    let wall = new CANNON.Body({ mass: 0, position: new CANNON.Vec3(0,200,30), material: wallMaterial });
-    wall.quaternion.setFromAxisAngle(new CANNON.Vec3(0,0,1),-Math.PI/8);
-    wall.addShape(wallShape);
-    world.addBody(wall);
-
+    let sides = 3;
+    let walls = [];
     let wallCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
     let wallGeo = new BoxBufferGeometry(200,10,30);
-    let wallMesh = new Mesh( wallGeo, wallCol );
-    wallMesh.position.copy(wall.position);
-    wallMesh.quaternion.copy(wall.quaternion);
-    scene.add(wallMesh);
+    let wallShape = new CANNON.Box(new CANNON.Vec3(100,5,15));
+    
+    for (var x=0; x<sides;x++) {
 
+        var wallPhys = new CANNON.Body({ mass: 0, position:new CANNON.Vec3(0,0,30), material: wallMaterial });
+        wallPhys.quaternion.setFromAxisAngle(new CANNON.Vec3(0,0,1),((2*Math.PI)/sides)*x);
+        wallPhys.position.vadd(new CANNON.Vec3(0,100,0), wallPhys.position);
+        wallPhys.addShape(wallShape);
+        world.addBody(wallPhys);
+    
+        var wallMesh = new Mesh( wallGeo, wallCol );
+        wallMesh.position.copy(wallPhys.position);
+        wallMesh.quaternion.copy(wallPhys.quaternion);
+        scene.add(wallMesh);
 
-    let wallShape2 = new CANNON.Box(new CANNON.Vec3(100,5,15));
-    let wall2 = new CANNON.Body({ mass: 0, position: new CANNON.Vec3(0,-200,30), material: wallMaterial });
-    wall2.addShape(wallShape2);
-    world.addBody(wall2);
+        var wall = { phys: wallPhys, mesh: wallMesh};
+        walls.push(wall);
 
-    let wallMesh2 = new Mesh( wallGeo, wallCol );
-    wallMesh2.position.set(0,-200,30);
-    scene.add(wallMesh2);
+    }
 
 
     let playerCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
