@@ -1,4 +1,4 @@
-
+import Matter from 'matter-js';
 
 import { PerspectiveCamera } from '../node_modules/three/src/cameras/PerspectiveCamera';
 import { OrthographicCamera } from '../node_modules/three/src/cameras/OrthographicCamera';
@@ -16,6 +16,25 @@ import { TorusBufferGeometry } from '../node_modules/three/src/geometries/TorusG
 import { MeshPhongMaterial } from '../node_modules/three/src/materials/MeshPhongMaterial';
 import { Object3D } from '../node_modules/three/src/core/Object3D';
 
+//settings
+
+//networking
+
+//world
+
+var Engine = Matter.Engine,
+    World = Matter.World,
+    Bodies = Matter.Bodies;
+var engine;
+
+//field class
+
+//wall class
+
+//player class
+
+//puck class
+
 let world, scene, renderer, camera, player, field, fieldMesh, ball, ballMesh;
 var timeStep = 1/60;
 let walls = [];
@@ -23,7 +42,35 @@ let walls = [];
 function init() {
 
     scene = new Scene();
+
+    // engine = Engine.create({render: {visible: false}});
+
+    // // create two circles and a ground
+    // var circles = [];
+    // for (var i = 0; i < dataSet.length; i++) {
+    //     var x = X_START_POS + (i % 16) * (DOT_SIZE + 5);
+    //     var y = Y_START_POS + Math.floor(i / 16) * (DOT_SIZE + 5);
+    //     var s = DOT_SIZE;
+    //     circles.push(Bodies.circle(x, y, DOT_SIZE * 0.5, {
+    //         friction: 0.00001,
+    //         restitution: 0.5,
+    //         density: 0.001
+    //     }));
+    // }
+
+    // var ground = Bodies.rectangle(400, 610, 810, 60, {isStatic: true});
+    // var wallA = Bodies.rectangle(0, 305, 60, 670, {isStatic: true});
+    // var wallB = Bodies.rectangle(800, 305, 60, 670, {isStatic: true});
+    // var ceiling = Bodies.rectangle(400, 0, 810, 60, {isStatic: true});
+
+    // // add all of the bodies to the world
+    // World.add(engine.world, circles);
+    // World.add(engine.world, [ground, wallA, wallB, ceiling]);
+
+    // Engine.run(engine);
     
+
+
     let fieldCol = new MeshPhongMaterial({ color: "#00ff00", shininess: 0 });
     let fieldGeo = new CylinderBufferGeometry(250,250,30,64);
     fieldMesh = new Mesh( fieldGeo, fieldCol );
@@ -36,6 +83,8 @@ function init() {
     ballMesh.rotation.set(Math.PI/2,0,0);
     ballMesh.translateY(15);
     scene.add(ballMesh);
+
+    // var ceiling = Bodies.rectangle(400, 0, 810, 60, {isStatic: true});
 
     let sides = 5;
     let wallCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
@@ -52,10 +101,12 @@ function init() {
         scene.add(wallMesh);
 
         var wall = { mesh: wallMesh};
+
+        // var ceiling = Bodies.rectangle(400, 0, 810, 60, {isStatic: true});
+
         walls.push(wall);
 
     }
-
 
     let playerCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
     let playerGeo = new TorusBufferGeometry(250, 10, 6, 6, Math.PI/6);
@@ -91,6 +142,12 @@ function init() {
 
 function animate() {
     player.rotation.z += 0.025;
+
+    // for (var j = 0; j < engine.world.bodies.length; j++) {
+    //     var b = engine.world.bodies[j].position;
+    //     bodies[j].position.set(b.x - 405, -(b.y - 305), 0)
+    // }
+
     render();
     requestAnimationFrame( animate );
 }
