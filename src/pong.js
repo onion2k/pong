@@ -43,8 +43,9 @@ function init() {
 
     scene = new Scene();
 
-    // engine = Engine.create({render: {visible: false}});
-
+    engine = Engine.create();
+    engine.world.gravity.y = 0;
+    
     // // create two circles and a ground
     // var circles = [];
     // for (var i = 0; i < dataSet.length; i++) {
@@ -67,10 +68,6 @@ function init() {
     // World.add(engine.world, circles);
     // World.add(engine.world, [ground, wallA, wallB, ceiling]);
 
-    // Engine.run(engine);
-    
-
-
     let fieldCol = new MeshPhongMaterial({ color: "#00ff00", shininess: 0 });
     let fieldGeo = new CylinderBufferGeometry(250,250,30,64);
     fieldMesh = new Mesh( fieldGeo, fieldCol );
@@ -84,7 +81,12 @@ function init() {
     ballMesh.translateY(15);
     scene.add(ballMesh);
 
-    // var ceiling = Bodies.rectangle(400, 0, 810, 60, {isStatic: true});
+    player = Bodies.circle(0, 0, 25, {
+        friction: 0.0,
+        restitution: 1.5,
+        density: 0.005
+    });
+    World.add(engine.world, player);
 
     let sides = 5;
     let wallCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
@@ -100,8 +102,11 @@ function init() {
         wallMesh.translateY(150);
         scene.add(wallMesh);
 
-        var wall = { mesh: wallMesh};
-
+        var wall = Bodies.rectangle(0, 0, 200, 10, {isStatic: true});
+        World.add(engine.world, wall);
+        Matter.Body.setPosition(wall, { x: wallMesh.position.x, y: wallMesh.position.y });
+        Matter.Body.setAngle(wall, wallMesh.rotation.z);
+        
         // var ceiling = Bodies.rectangle(400, 0, 810, 60, {isStatic: true});
 
         walls.push(wall);
@@ -138,19 +143,25 @@ function init() {
     renderer.setSize(800,600 );
     container.appendChild( renderer.domElement );
 
+    Engine.run(engine);
+    
 }
 
 function animate() {
     player.rotation.z += 0.025;
 
-    // for (var j = 0; j < engine.world.bodies.length; j++) {
-    //     var b = engine.world.bodies[j].position;
-    //     bodies[j].position.set(b.x - 405, -(b.y - 305), 0)
-    // }
+    var b = engine.world.bodies[0].position;
+    ballMesh.position.set(b.x, b.y, 30);
 
     render();
     requestAnimationFrame( animate );
+
 }
+
+setTimeout(function(){
+    var b = engine.world.bodies[0];
+    Matter.Body.applyForce(b, b.position, {x: 0.1, y: 0.2 });
+}, 500);
 
 function render() {
     renderer.render( scene, camera );
