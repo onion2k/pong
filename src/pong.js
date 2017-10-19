@@ -182,15 +182,15 @@ init();
 animate();
 
 
-document.addEventListener('keydown', (e)=>{
+document.addEventListener('keyup', (e)=>{
     switch (e.keyCode) {
         case 37: //left
             console.log('l');
-            Matter.Body.translate(player, player.position, { x: 0, y: 0.0001 });
+            Matter.Body.applyForce(player, player.position, { x: Math.cos(-Math.PI)*0.01, y: Math.sin(-Math.PI)*0.01 });
         break;
         case 39: //right
             console.log('r');
-            Matter.Body.translate(player, player.position, { x: 0, y: -0.0001 });
+            Matter.Body.applyForce(player, player.position, { x: Math.cos(Math.PI)*0.01, y: Math.sin(Math.PI)*0.01 });
         break;
     }
 });
