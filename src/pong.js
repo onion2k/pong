@@ -24,6 +24,7 @@ import { Object3D } from '../node_modules/three/src/core/Object3D';
 
 var Engine = Matter.Engine,
     World = Matter.World,
+    Render = Matter.Render,
     Bodies = Matter.Bodies;
 var engine;
 
@@ -35,7 +36,7 @@ var engine;
 
 //puck class
 
-let world, scene, renderer, camera, player, playerMesh, field, fieldMesh, ball, ballMesh;
+let world, scene, renderer, render, camera, player, playerMesh, field, fieldMesh, ball, ballMesh;
 var timeStep = 1/60;
 let walls = [];
 
@@ -45,7 +46,12 @@ function init() {
 
     engine = Engine.create();
     engine.world.gravity.y = 0;
-    
+
+    render = Render.create({
+        element: document.body,
+        engine: engine
+    });
+
     // // create two circles and a ground
     // var circles = [];
     // for (var i = 0; i < dataSet.length; i++) {
@@ -81,7 +87,7 @@ function init() {
     ballMesh.translateY(15);
     scene.add(ballMesh);
 
-    ball = Bodies.circle(0, 0, 25, {
+    ball = Bodies.circle(200, 200, 25, {
         friction: 0.0,
         frictionAir: 0.0,
         frictionStatic: 0.25,
@@ -106,7 +112,7 @@ function init() {
 
         var wall = Bodies.rectangle(0, 0, 200, 10, {isStatic: true});
         World.add(engine.world, wall);
-        Matter.Body.setPosition(wall, { x: wallMesh.position.x, y: wallMesh.position.y });
+        Matter.Body.setPosition(wall, { x: wallMesh.position.x + 200, y: wallMesh.position.y + 200 });
         Matter.Body.setAngle(wall, wallMesh.rotation.z);
         
         // var ceiling = Bodies.rectangle(400, 0, 810, 60, {isStatic: true});
@@ -124,9 +130,9 @@ function init() {
     playerMesh.translateY(130);
     scene.add(playerMesh);
 
-    player = Bodies.rectangle(0, 0, 100, 10);
+    player = Bodies.rectangle(0, 0, 100, 10, { density: 10000000 });
     World.add(engine.world, player);
-    Matter.Body.setPosition(player, { x: playerMesh.position.x, y: playerMesh.position.y });
+    Matter.Body.setPosition(player, { x: playerMesh.position.x + 200, y: playerMesh.position.y + 200 });
     Matter.Body.setAngle(player, playerMesh.rotation.z);
     
     // var ceiling = Bodies.rectangle(400, 0, 810, 60, {isStatic: true});
@@ -157,15 +163,16 @@ function init() {
     container.appendChild( renderer.domElement );
 
     Engine.run(engine);
+    Render.run(render);
     
 }
 
 function animate() {
 
-    playerMesh.position.set(player.position.x, player.position.y, 30);
-    ballMesh.position.set(ball.position.x, ball.position.y, 30);
+    playerMesh.position.set(player.position.x-200, player.position.y-200, 30);
+    ballMesh.position.set(ball.position.x-200, ball.position.y-200, 30);
     
-    render();
+    render3D();
     requestAnimationFrame( animate );
 
 }
@@ -174,23 +181,24 @@ setTimeout(function(){
     Matter.Body.applyForce(ball, ball.position, { x: 0.1, y: 0.2 });
 }, 500);
 
-function render() {
+function render3D() {
     renderer.render( scene, camera );
 }
 
 init();
 animate();
 
-
-document.addEventListener('keyup', (e)=>{
+var speed = 3;
+var playerVelocity;
+document.addEventListener('keydown', (e)=>{
     switch (e.keyCode) {
-        case 37: //left
-            console.log('l');
-            Matter.Body.applyForce(player, player.position, { x: Math.cos(-Math.PI)*0.01, y: Math.sin(-Math.PI)*0.01 });
-        break;
-        case 39: //right
-            console.log('r');
-            Matter.Body.applyForce(player, player.position, { x: Math.cos(Math.PI)*0.01, y: Math.sin(Math.PI)*0.01 });
+        case 37:
+            playerVelocity = { x: Math.cos(player.angle) * 1 * speed, y: Math.sin(player.angle) * 1 * speed };
+            Matter.Body.setVelocity(player, playerVelocity);
+            break;
+        case 39:
+            playerVelocity = { x: Math.cos(player.angle) * -1 * speed, y: Math.sin(player.angle) * -1 * speed };
+            Matter.Body.setVelocity(player, playerVelocity);
         break;
     }
-});
+})
