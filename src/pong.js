@@ -35,7 +35,7 @@ var engine;
 
 //puck class
 
-let world, scene, renderer, camera, player, field, fieldMesh, ball, ballMesh;
+let world, scene, renderer, camera, player, playerMesh, field, fieldMesh, ball, ballMesh;
 var timeStep = 1/60;
 let walls = [];
 
@@ -81,12 +81,14 @@ function init() {
     ballMesh.translateY(15);
     scene.add(ballMesh);
 
-    player = Bodies.circle(0, 0, 25, {
+    ball = Bodies.circle(0, 0, 25, {
         friction: 0.0,
-        restitution: 1.5,
+        frictionAir: 0.0,
+        frictionStatic: 0.25,
+        restitution: 1.0,
         density: 0.005
     });
-    World.add(engine.world, player);
+    World.add(engine.world, ball);
 
     let sides = 5;
     let wallCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
@@ -113,12 +115,23 @@ function init() {
 
     }
 
-    let playerCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
-    let playerGeo = new TorusBufferGeometry(250, 10, 6, 6, Math.PI/6);
-    player = new Mesh( playerGeo, playerCol );
-    player.position.set(0,0,20);
-    player.rotation.set(0,0,0);
-    scene.add(player);
+    let batCol = new MeshPhongMaterial({ color: "#ff00ff", shininess: 0 });
+    let batGeo = new BoxBufferGeometry(100,10,30);
+
+    playerMesh = new Mesh( batGeo, batCol );
+    playerMesh.rotation.set(0,0,((2*Math.PI)/sides) * 3);
+    playerMesh.translateZ(30);
+    playerMesh.translateY(130);
+    scene.add(playerMesh);
+
+    player = Bodies.rectangle(0, 0, 100, 10);
+    World.add(engine.world, player);
+    Matter.Body.setPosition(player, { x: playerMesh.position.x, y: playerMesh.position.y });
+    Matter.Body.setAngle(player, playerMesh.rotation.z);
+    
+    // var ceiling = Bodies.rectangle(400, 0, 810, 60, {isStatic: true});
+
+    walls.push(wall);
 
     camera = new PerspectiveCamera( 70, 800/600, 1, 5000 );
     //camera = new OrthographicCamera( -480, 480, 320, -320, -400, 400 );
@@ -148,19 +161,17 @@ function init() {
 }
 
 function animate() {
-    player.rotation.z += 0.025;
 
-    var b = engine.world.bodies[0].position;
-    ballMesh.position.set(b.x, b.y, 30);
-
+    playerMesh.position.set(player.position.x, player.position.y, 30);
+    ballMesh.position.set(ball.position.x, ball.position.y, 30);
+    
     render();
     requestAnimationFrame( animate );
 
 }
 
 setTimeout(function(){
-    var b = engine.world.bodies[0];
-    Matter.Body.applyForce(b, b.position, {x: 0.1, y: 0.2 });
+    Matter.Body.applyForce(ball, ball.position, { x: 0.1, y: 0.2 });
 }, 500);
 
 function render() {
@@ -169,3 +180,17 @@ function render() {
 
 init();
 animate();
+
+
+document.addEventListener('keydown', (e)=>{
+    switch (e.keyCode) {
+        case 37: //left
+            console.log('l');
+            Matter.Body.translate(player, player.position, { x: 0, y: 0.0001 });
+        break;
+        case 39: //right
+            console.log('r');
+            Matter.Body.translate(player, player.position, { x: 0, y: -0.0001 });
+        break;
+    }
+});
