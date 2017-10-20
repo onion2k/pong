@@ -20,8 +20,6 @@ import { Object3D } from '../node_modules/three/src/core/Object3D';
 
 import settings from './components/settings';
 
-console.log(settings);
-
 //networking
 
 //world
@@ -40,7 +38,9 @@ var engine;
 
 //puck class
 
-let world, scene, renderer, render, camera, player, playerMesh, field, fieldMesh, ball, ballMesh;
+var speed = 3;
+var playerVelocity = { x: 0, y: 0};
+let world, scene, renderer, render, camera, player, playerMesh, field, fieldMesh, ball, ballMesh, cameraTarget;
 var timeStep = 1/60;
 let walls = [];
 
@@ -100,6 +100,18 @@ function init() {
     });
     World.add(engine.world, ball);
 
+    let centerCol = new MeshPhongMaterial({ color: "#888888", shininess: 0 });
+    let centerGeo = new CylinderBufferGeometry(15,15,20,16);
+    let centerMesh = new Mesh( centerGeo, centerCol );
+    centerMesh.rotation.set(Math.PI/2,0,0);
+    centerMesh.translateY(30);
+    scene.add(centerMesh);
+
+    let center = Bodies.circle(200, 200, 15, {
+        isStatic: true
+    });
+    World.add(engine.world, center);
+
     let sides = settings.players;
     let wallCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
     let wallGeo = new BoxBufferGeometry(200,10,30);
@@ -111,7 +123,7 @@ function init() {
         var wallMesh = new Mesh( wallGeo, wallCol );
         wallMesh.rotation.set(0,0,((2*Math.PI)/sides) * x);
         wallMesh.translateZ(30);
-        wallMesh.translateY(150);
+        wallMesh.translateY(25*settings.players);
         scene.add(wallMesh);
 
         var wall = Bodies.rectangle(0, 0, 200, 10, {isStatic: true});
@@ -134,7 +146,7 @@ function init() {
     playerMesh.translateY(130);
     scene.add(playerMesh);
 
-    player = Bodies.rectangle(0, 0, 100, 10, { density: 10000000 });
+    player = Bodies.rectangle(0, 0, 100, 10, {isStatic: true});
     World.add(engine.world, player);
     Matter.Body.setPosition(player, { x: playerMesh.position.x + 200, y: playerMesh.position.y + 200 });
     Matter.Body.setAngle(player, playerMesh.rotation.z);
@@ -143,13 +155,20 @@ function init() {
 
     walls.push(wall);
 
+    cameraTarget = new Object3D();
+    cameraTarget.position.set(0,0,0);
+    cameraTarget.rotation.set(0,0,0.601);
     camera = new PerspectiveCamera( 70, 800/600, 1, 5000 );
     //camera = new OrthographicCamera( -480, 480, 320, -320, -400, 400 );
     camera.position.x = 0;
-    camera.position.y = -250;
-    camera.position.z = 500;
+    camera.position.y = -300;
+    camera.position.z = 300;
 
-    camera.lookAt(fieldMesh.position);
+    cameraTarget.add(camera);
+
+    camera.lookAt(cameraTarget.position);
+
+    scene.add(cameraTarget);
 
     let amblight = new AmbientLight( 0x808080 );
     scene.add( amblight );
@@ -173,6 +192,10 @@ function init() {
 
 function animate() {
 
+    // cameraTarget.rotation.z += 0.01;
+
+    Matter.Body.translate(player, playerVelocity);
+
     playerMesh.position.set(player.position.x-200, player.position.y-200, 30);
     ballMesh.position.set(ball.position.x-200, ball.position.y-200, 30);
     
@@ -192,17 +215,19 @@ function render3D() {
 init();
 animate();
 
-var speed = 3;
-var playerVelocity;
 document.addEventListener('keydown', (e)=>{
     switch (e.keyCode) {
         case 37:
-            playerVelocity = { x: Math.cos(player.angle) * 1 * speed, y: Math.sin(player.angle) * 1 * speed };
-            Matter.Body.setVelocity(player, playerVelocity);
-            break;
+           playerVelocity = { x: Math.cos(player.angle) * 1 * speed, y: Math.sin(player.angle) * 1 * speed };
+           //Matter.Body.setVelocity(player, playerVelocity);
+           break;
         case 39:
-            playerVelocity = { x: Math.cos(player.angle) * -1 * speed, y: Math.sin(player.angle) * -1 * speed };
-            Matter.Body.setVelocity(player, playerVelocity);
+           playerVelocity = { x: Math.cos(player.angle) * -1 * speed, y: Math.sin(player.angle) * -1 * speed };
+           //Matter.Body.setVelocity(player, playerVelocity);
         break;
     }
-})
+});
+
+document.addEventListener('keyup', (e)=>{
+    playerVelocity = { x: 0, y: 0 };
+});
