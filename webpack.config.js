@@ -37,7 +37,7 @@ module.exports = {
     },
     plugins: [
         new WebpackCleanupPlugin(),
-        new UglifyJSPlugin(),
+        // new UglifyJSPlugin(),
         // new SriPlugin({
         //     hashFuncNames: ['sha256', 'sha384'],
         //     enabled: true

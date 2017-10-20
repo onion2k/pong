@@ -18,6 +18,10 @@ import { Object3D } from '../node_modules/three/src/core/Object3D';
 
 //settings
 
+import settings from './components/settings';
+
+console.log(settings);
+
 //networking
 
 //world
@@ -96,7 +100,7 @@ function init() {
     });
     World.add(engine.world, ball);
 
-    let sides = 5;
+    let sides = settings.players;
     let wallCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
     let wallGeo = new BoxBufferGeometry(200,10,30);
 
