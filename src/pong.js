@@ -16,13 +16,12 @@ import { TorusBufferGeometry } from '../node_modules/three/src/geometries/TorusG
 import { MeshPhongMaterial } from '../node_modules/three/src/materials/MeshPhongMaterial';
 import { Object3D } from '../node_modules/three/src/core/Object3D';
 
-//settings
-
 import settings from './components/settings';
+import field from './components/field';
+import puck from './components/puck';
 
-//networking
-
-//world
+import { center, wall } from './components/arena';
+// import player from './components/player';
 
 var Engine = Matter.Engine,
     World = Matter.World,
@@ -30,17 +29,9 @@ var Engine = Matter.Engine,
     Bodies = Matter.Bodies;
 var engine;
 
-//field class
-
-//wall class
-
-//player class
-
-//puck class
-
 var speed = 3;
 var playerVelocity = { x: 0, y: 0};
-let world, scene, renderer, render, camera, player, playerMesh, field, fieldMesh, ball, ballMesh, cameraTarget;
+let world, scene, renderer, render, camera, player, playerMesh, ball, ballMesh, cameraTarget;
 var timeStep = 1/60;
 let walls = [];
 
@@ -56,84 +47,28 @@ function init() {
         engine: engine
     });
 
-    // // create two circles and a ground
-    // var circles = [];
-    // for (var i = 0; i < dataSet.length; i++) {
-    //     var x = X_START_POS + (i % 16) * (DOT_SIZE + 5);
-    //     var y = Y_START_POS + Math.floor(i / 16) * (DOT_SIZE + 5);
-    //     var s = DOT_SIZE;
-    //     circles.push(Bodies.circle(x, y, DOT_SIZE * 0.5, {
-    //         friction: 0.00001,
-    //         restitution: 0.5,
-    //         density: 0.001
-    //     }));
-    // }
+    scene.add(field);
+    scene.add(puck.mesh);
+    World.add(engine.world, puck.phys);
 
-    // var ground = Bodies.rectangle(400, 610, 810, 60, {isStatic: true});
-    // var wallA = Bodies.rectangle(0, 305, 60, 670, {isStatic: true});
-    // var wallB = Bodies.rectangle(800, 305, 60, 670, {isStatic: true});
-    // var ceiling = Bodies.rectangle(400, 0, 810, 60, {isStatic: true});
-
-    // // add all of the bodies to the world
-    // World.add(engine.world, circles);
-    // World.add(engine.world, [ground, wallA, wallB, ceiling]);
-
-    let fieldCol = new MeshPhongMaterial({ color: "#00ff00", shininess: 0 });
-    let fieldGeo = new CylinderBufferGeometry(250,250,30,64);
-    fieldMesh = new Mesh( fieldGeo, fieldCol );
-    fieldMesh.rotation.set(Math.PI/2,0,0);
-    scene.add(fieldMesh);
-
-    let ballCol = new MeshPhongMaterial({ color: "#0000ff", shininess: 0 });
-    let ballGeo = new CylinderBufferGeometry(25,25,10,16);
-    ballMesh = new Mesh( ballGeo, ballCol );
-    ballMesh.rotation.set(Math.PI/2,0,0);
-    ballMesh.translateY(15);
-    scene.add(ballMesh);
-
-    ball = Bodies.circle(200, 200, 25, {
-        friction: 0.0,
-        frictionAir: 0.0,
-        frictionStatic: 0.25,
-        restitution: 1.0,
-        density: 0.005
-    });
-    World.add(engine.world, ball);
-
-    let centerCol = new MeshPhongMaterial({ color: "#888888", shininess: 0 });
-    let centerGeo = new CylinderBufferGeometry(15,15,20,16);
-    let centerMesh = new Mesh( centerGeo, centerCol );
-    centerMesh.rotation.set(Math.PI/2,0,0);
-    centerMesh.translateY(30);
-    scene.add(centerMesh);
-
-    let center = Bodies.circle(200, 200, 15, {
-        isStatic: true
-    });
-    World.add(engine.world, center);
+    scene.add(center.mesh);
+    World.add(engine.world, center.phys);
 
     let sides = settings.players;
-    let wallCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
-    let wallGeo = new BoxBufferGeometry(200,10,30);
 
     for (var x=0; x<sides;x++) {
 
-        //rotate then move along body axis
-    
-        var wallMesh = new Mesh( wallGeo, wallCol );
+        var wallMesh = wall.mesh.clone();
         wallMesh.rotation.set(0,0,((2*Math.PI)/sides) * x);
-        wallMesh.translateZ(30);
         wallMesh.translateY(25*settings.players);
         scene.add(wallMesh);
 
-        var wall = Bodies.rectangle(0, 0, 200, 10, {isStatic: true});
-        World.add(engine.world, wall);
-        Matter.Body.setPosition(wall, { x: wallMesh.position.x + 200, y: wallMesh.position.y + 200 });
-        Matter.Body.setAngle(wall, wallMesh.rotation.z);
-        
-        // var ceiling = Bodies.rectangle(400, 0, 810, 60, {isStatic: true});
+        var wall1 = Object.clone(wall.phys);
+        World.add(engine.world, wall1);
+        Matter.Body.setPosition(wall1, { x: wallMesh.position.x + 200, y: wallMesh.position.y + 200 });
+        Matter.Body.setAngle(wall1, wallMesh.rotation.z);
 
-        walls.push(wall);
+        walls.push(wall1);
 
     }
 
@@ -151,10 +86,6 @@ function init() {
     Matter.Body.setPosition(player, { x: playerMesh.position.x + 200, y: playerMesh.position.y + 200 });
     Matter.Body.setAngle(player, playerMesh.rotation.z);
     
-    // var ceiling = Bodies.rectangle(400, 0, 810, 60, {isStatic: true});
-
-    walls.push(wall);
-
     cameraTarget = new Object3D();
     cameraTarget.position.set(0,0,0);
     cameraTarget.rotation.set(0,0,0.601);
@@ -197,7 +128,7 @@ function animate() {
     Matter.Body.translate(player, playerVelocity);
 
     playerMesh.position.set(player.position.x-200, player.position.y-200, 30);
-    ballMesh.position.set(ball.position.x-200, ball.position.y-200, 30);
+    puck.mesh.position.set(puck.phys.position.x-200, puck.phys.position.y-200, 30);
     
     render3D();
     requestAnimationFrame( animate );
@@ -205,7 +136,7 @@ function animate() {
 }
 
 setTimeout(function(){
-    Matter.Body.applyForce(ball, ball.position, { x: 0.1, y: 0.2 });
+    Matter.Body.applyForce(puck.phys, puck.phys.position, { x: 0.1, y: 0.2 });
 }, 500);
 
 function render3D() {
