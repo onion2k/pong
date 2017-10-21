@@ -13,7 +13,7 @@ function arenapost(){
     postMesh.rotation.set(Math.PI/2,0,0);
     postMesh.translateY(30);
 
-    let post = Matter.Bodies.circle(200, 200, 15, {
+    let post = Matter.Bodies.circle(0, 0, 15, {
         isStatic: true
     });
 
@@ -23,12 +23,15 @@ function arenapost(){
 
 function arenawall(){
 
+    const length = 400;
+    const width = 30;
+
     const wallCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
-    const wallGeo = new BoxBufferGeometry(200,10,30);
+    const wallGeo = new BoxBufferGeometry(length,width,30);
     const wallMesh = new Mesh( wallGeo, wallCol );
     wallMesh.translateZ(30);
     
-    const wallPhys = Matter.Bodies.rectangle(0, 0, 200, 10, {isStatic: true});
+    const wallPhys = Matter.Bodies.rectangle(0, 0, length, width, {isStatic: true });
     
     return { mesh: wallMesh, phys: wallPhys };
         

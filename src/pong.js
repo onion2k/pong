@@ -25,18 +25,29 @@ var playerVelocity = { x: 0, y: 0};
 let world, scene, renderer, render, camera, player, playerMesh, ball, ballMesh, cameraTarget;
 var timeStep = 1/60;
 let walls = [];
+let debug = true;
 
 function init() {
 
     scene = new Scene();
 
-    engine = Engine.create();
+    engine = Engine.create({
+        positionIterations: 10,
+        velocityIterations: 30
+    });
     engine.world.gravity.y = 0;
 
-    render = Render.create({
-        element: document.body,
-        engine: engine
-    });
+    if (debug) {
+        render = Render.create({
+            element: document.body,
+            engine: engine,
+            hasBounds: true,
+            bounds: {
+                min: {x: -400, y: -300 },
+                max: {x: 400, y: 300 }
+            }
+        });
+    }
 
     scene.add(field);
     scene.add(puck.mesh);
@@ -46,27 +57,25 @@ function init() {
     scene.add(center.mesh);
     World.add(engine.world, center.phys);
 
-    let sides = settings.players;
-
-    for (var x=0; x<sides;x++) {
+    for (var x=0; x<settings.players;x++) {
 
         var wall = new arenawall();
 
         var wallMesh = wall.mesh;
-        wallMesh.rotation.set(0,0,((2*Math.PI)/sides) * x);
-        wallMesh.translateY(25*settings.players);
+        wallMesh.rotation.set(0,0,((2*Math.PI)/settings.players) * x);
+        wallMesh.translateY(50*settings.players);
         scene.add(wallMesh);
 
         var wall1 = wall.phys;
         World.add(engine.world, wall1);
-        Matter.Body.setPosition(wall1, { x: wallMesh.position.x + 200, y: wallMesh.position.y + 200 });
+        Matter.Body.setPosition(wall1, { x: wallMesh.position.x, y: wallMesh.position.y });
         Matter.Body.setAngle(wall1, wallMesh.rotation.z);
 
         walls.push(wall1);
 
     }
 
-    player = initplayer(sides, 3);
+    player = initplayer(settings.players, 3);
     scene.add(player.mesh);
     World.add(engine.world, player.phys);
     
@@ -75,8 +84,8 @@ function init() {
     cameraTarget.rotation.set(0,0,0.601);
     camera = new PerspectiveCamera( 70, 800/600, 1, 5000 );
     camera.position.x = 0;
-    camera.position.y = -300;
-    camera.position.z = 300;
+    camera.position.y = 0;
+    camera.position.z = 500;
 
     cameraTarget.add(camera);
 
@@ -100,18 +109,21 @@ function init() {
     container.appendChild( renderer.domElement );
 
     Engine.run(engine);
-    Render.run(render);
+
+    if (debug) {
+        Render.run(render);
+    }
     
 }
 
 function animate() {
 
-    cameraTarget.rotation.z += 0.01;
+    // cameraTarget.rotation.z += 0.01;
 
     Matter.Body.translate(player.phys, playerVelocity);
 
-    player.mesh.position.set(player.phys.position.x-200, player.phys.position.y-200, 30);
-    puck.mesh.position.set(puck.phys.position.x-200, puck.phys.position.y-200, 30);
+    player.mesh.position.set(player.phys.position.x, player.phys.position.y, 30);
+    puck.mesh.position.set(puck.phys.position.x, puck.phys.position.y, 30);
     
     render3D();
     requestAnimationFrame( animate );
@@ -119,7 +131,7 @@ function animate() {
 }
 
 setTimeout(function(){
-    Matter.Body.applyForce(puck.phys, puck.phys.position, { x: 0.1, y: 0.2 });
+    Matter.Body.applyForce(puck.phys, puck.phys.position, { x: 0.005, y: 0.01 });
 }, 500);
 
 function render3D() {
