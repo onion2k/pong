@@ -5,17 +5,19 @@ import { BoxBufferGeometry } from '../../node_modules/three/src/geometries/BoxGe
 import { CylinderBufferGeometry } from '../../node_modules/three/src/geometries/CylinderGeometry';
 import { MeshPhongMaterial } from '../../node_modules/three/src/materials/MeshPhongMaterial';
 
-function arenapost(){
+function arenapost(x, y){
 
     const postCol = new MeshPhongMaterial({ color: "#888888", shininess: 0 });
     const postGeo = new CylinderBufferGeometry(15,15,20,16);
     const postMesh = new Mesh( postGeo, postCol );
-    postMesh.rotation.set(Math.PI/2,0,0);
-    postMesh.translateY(30);
 
-    let post = Matter.Bodies.circle(0, 0, 15, {
-        isStatic: true
-    });
+    postMesh.rotation.set(Math.PI/2,Math.PI,0);
+
+    postMesh.translateX(x);
+    postMesh.translateY(30);
+    postMesh.translateZ(y);
+
+    let post = Matter.Bodies.circle(x, y, 15, { isStatic: true });
 
     return { mesh: postMesh, phys: post };
 

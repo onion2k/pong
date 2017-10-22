@@ -30,16 +30,13 @@ var Engine = Matter.Engine,
 }
 
 var playerVelocity = { x: 0, y: 0};
-let world, engine, scene, player;
+let world, engine, scene, player, render;
 
 function init() {
 
     scene = new Scene();
 
-    engine = Engine.create({
-        positionIterations: 10,
-        velocityIterations: 30
-    });
+    engine = Engine.create();
 
     engine.world.gravity.y = game.gravity; //-0.98;
 
@@ -63,9 +60,14 @@ function init() {
     scene.add(player.mesh);
     World.add(engine.world, player.phys);
 
-    const center = new arenapost();
-    World.add(engine.world, center.phys);
-    scene.add(center.mesh);
+
+    for (var x=0;x<12;x++) {
+        var px = x%4;
+        var py = Math.floor(x/4);
+        var post = new arenapost(120 - (px*80), 80 - (py*80));
+        scene.add(post.mesh);
+        World.add(engine.world, post.phys);
+    }
 
     for (var x=0; x<settings.players; x++) {
 
