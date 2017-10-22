@@ -14,6 +14,9 @@ import field from './components/field';
 import puck from './components/puck';
 import { arenapost, arenawall } from './components/arena';
 
+import renderer from './components/render';
+import camera from './components/camera';
+
 var Engine = Matter.Engine,
     World = Matter.World,
     Render = Matter.Render,
@@ -27,7 +30,7 @@ var Engine = Matter.Engine,
 }
 
 var playerVelocity = { x: 0, y: 0};
-let world, engine, scene, renderer, render, player, camera, cameraTarget;
+let world, engine, scene, player;
 
 function init() {
 
@@ -56,9 +59,13 @@ function init() {
     scene.add(puck.mesh);
     World.add(engine.world, puck.phys);
 
-    var center = new arenapost();
-    scene.add(center.mesh);
+    player = initplayer(settings.players, 0);
+    scene.add(player.mesh);
+    World.add(engine.world, player.phys);
+
+    const center = new arenapost();
     World.add(engine.world, center.phys);
+    scene.add(center.mesh);
 
     for (var x=0; x<settings.players; x++) {
 
@@ -69,28 +76,14 @@ function init() {
         wallMesh.translateY(50*settings.players);
         scene.add(wallMesh);
 
-        var wall1 = wall.phys;
-        World.add(engine.world, wall1);
-        Matter.Body.setPosition(wall1, { x: wallMesh.position.x, y: wallMesh.position.y });
-        Matter.Body.setAngle(wall1, wallMesh.rotation.z);
+        var wallPhys = wall.phys;
+        World.add(engine.world, wallPhys);
+        Matter.Body.setPosition(wallPhys, { x: wallMesh.position.x, y: wallMesh.position.y });
+        Matter.Body.setAngle(wallPhys, wallMesh.rotation.z);
 
     }
 
-    player = initplayer(settings.players, 0);
-    scene.add(player.mesh);
-    World.add(engine.world, player.phys);
-    
-    cameraTarget = new Object3D();
-    cameraTarget.position.set(0,0,0);
-    cameraTarget.rotation.set(0,0,Math.PI);
-    camera = new PerspectiveCamera( 70, 800/600, 1, 5000 );
-    camera.position.x = 0;
-    camera.position.y = -300;
-    camera.position.z = 700;
-
-    cameraTarget.add(camera);
-    camera.lookAt(cameraTarget.position);
-    scene.add(cameraTarget);
+    scene.add(camera.handle);
 
     let amblight = new AmbientLight( 0x808080 );
     scene.add( amblight );
@@ -101,10 +94,6 @@ function init() {
 
     let container = document.createElement( 'div' );
     document.body.appendChild( container );
-
-    renderer = new WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setClearColor( 0xffffff, 0);
-    renderer.setSize(800,600 );
     container.appendChild( renderer.domElement );
 
     Engine.run(engine);
@@ -117,24 +106,30 @@ function init() {
 
 function animate() {
 
-    // cameraTarget.rotation.z += 0.01;
-
     Matter.Body.translate(player.phys, playerVelocity);
 
     player.mesh.position.set(player.phys.position.x, player.phys.position.y, 30);
     puck.mesh.position.set(puck.phys.position.x, puck.phys.position.y, 30);
-    
+
+    if (Matter.Vector.magnitude(puck.phys.velocity) < 8) {
+        Matter.Body.setVelocity(puck.phys, Matter.Vector.mult(puck.phys.velocity, 1.01));
+    }
+
     render3D();
     requestAnimationFrame( animate );
 
 }
 
 setTimeout(function(){
+
     Matter.Body.applyForce(puck.phys, puck.phys.position, { x: 0.005, y: 0.01 });
+
 }, 500);
 
 function render3D() {
-    renderer.render( scene, camera );
+
+    renderer.render( scene, camera.camera );
+
 }
 
 init();
