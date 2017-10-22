@@ -18,14 +18,16 @@ var Engine = Matter.Engine,
     World = Matter.World,
     Render = Matter.Render,
     Bodies = Matter.Bodies;
-var engine;
 
-var speed = 3;
+    const game = {
+    gravity: 0,
+    speed: settings.player.speed,
+    timeStep: 1/60,
+    debug: false
+}
+
 var playerVelocity = { x: 0, y: 0};
-let world, scene, renderer, render, camera, player, playerMesh, ball, ballMesh, cameraTarget;
-var timeStep = 1/60;
-let walls = [];
-let debug = true;
+let world, engine, scene, renderer, render, player, camera, cameraTarget;
 
 function init() {
 
@@ -35,9 +37,10 @@ function init() {
         positionIterations: 10,
         velocityIterations: 30
     });
-    engine.world.gravity.y = 0;
 
-    if (debug) {
+    engine.world.gravity.y = game.gravity; //-0.98;
+
+    if (game.debug) {
         render = Render.create({
             element: document.body,
             engine: engine,
@@ -57,7 +60,7 @@ function init() {
     scene.add(center.mesh);
     World.add(engine.world, center.phys);
 
-    for (var x=0; x<settings.players;x++) {
+    for (var x=0; x<settings.players; x++) {
 
         var wall = new arenawall();
 
@@ -71,8 +74,6 @@ function init() {
         Matter.Body.setPosition(wall1, { x: wallMesh.position.x, y: wallMesh.position.y });
         Matter.Body.setAngle(wall1, wallMesh.rotation.z);
 
-        walls.push(wall1);
-
     }
 
     player = initplayer(settings.players, 3);
@@ -85,12 +86,10 @@ function init() {
     camera = new PerspectiveCamera( 70, 800/600, 1, 5000 );
     camera.position.x = 0;
     camera.position.y = 0;
-    camera.position.z = 500;
+    camera.position.z = 700;
 
     cameraTarget.add(camera);
-
     camera.lookAt(cameraTarget.position);
-
     scene.add(cameraTarget);
 
     let amblight = new AmbientLight( 0x808080 );
@@ -110,7 +109,7 @@ function init() {
 
     Engine.run(engine);
 
-    if (debug) {
+    if (game.debug) {
         Render.run(render);
     }
     
@@ -144,11 +143,11 @@ animate();
 document.addEventListener('keydown', (e)=>{
     switch (e.keyCode) {
         case 37:
-           playerVelocity = { x: Math.cos(player.phys.angle) * 1 * speed, y: Math.sin(player.phys.angle) * 1 * speed };
+           playerVelocity = { x: Math.cos(player.phys.angle) * 1 * game.speed, y: Math.sin(player.phys.angle) * 1 * game.speed };
            //Matter.Body.setVelocity(player, playerVelocity);
            break;
         case 39:
-           playerVelocity = { x: Math.cos(player.phys.angle) * -1 * speed, y: Math.sin(player.phys.angle) * -1 * speed };
+           playerVelocity = { x: Math.cos(player.phys.angle) * -1 * game.speed, y: Math.sin(player.phys.angle) * -1 * game.speed };
            //Matter.Body.setVelocity(player, playerVelocity);
         break;
     }
