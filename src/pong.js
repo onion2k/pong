@@ -26,7 +26,8 @@ const game = {
     gravity: 0,
     speed: settings.player.speed,
     timeStep: 1/60,
-    debug: false
+    debug: true,
+    playerId: 0
 }
 
 var playerVelocity = { x: 0, y: 0};
@@ -46,8 +47,8 @@ function init() {
             engine: engine,
             hasBounds: true,
             bounds: {
-                min: {x: -400, y: -300 },
-                max: {x: 400, y: 300 }
+                min: {x: -500, y: -400 },
+                max: {x: 500, y: 400 }
             }
         });
     }
@@ -56,7 +57,7 @@ function init() {
     scene.add(puck.mesh);
     World.add(engine.world, puck.phys);
 
-    player = initplayer(settings.players, 2);
+    player = initplayer(settings.players, game.playerId);
     scene.add(player.mesh);
     World.add(engine.world, player.phys);
 
@@ -98,7 +99,7 @@ function init() {
     scene.add( amblight );
     
     let pointlight = new PointLight( 0xffffff, 1, 2500 );
-    pointlight.position.set( 250, 500, 500 );
+    pointlight.position.set( 250, 250, 500 );
     scene.add( pointlight );
 
     let container = document.createElement( 'div' );
@@ -144,14 +145,16 @@ function render3D() {
 init();
 animate();
 
+let i = 1;
+
 document.addEventListener('keydown', (e)=>{
     switch (e.keyCode) {
         case 37:
-           playerVelocity = { x: Math.cos(player.phys.angle) * 1 * game.speed, y: Math.sin(player.phys.angle) * 1 * game.speed };
+           playerVelocity = { x: Math.cos(player.phys.angle) * game.speed * i * 1, y: Math.sin(player.phys.angle) * game.speed * i * 1 };
            //Matter.Body.setVelocity(player, playerVelocity);
            break;
         case 39:
-           playerVelocity = { x: Math.cos(player.phys.angle) * -1 * game.speed, y: Math.sin(player.phys.angle) * -1 * game.speed };
+           playerVelocity = { x: Math.cos(player.phys.angle) * game.speed * i * -1, y: Math.sin(player.phys.angle) * game.speed * i  * -1 };
            //Matter.Body.setVelocity(player, playerVelocity);
         break;
     }

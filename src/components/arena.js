@@ -11,12 +11,12 @@ function arenapost(x, y){
     const postGeo = new CylinderBufferGeometry(15,15,20,16);
     const postMesh = new Mesh( postGeo, postCol );
 
-    postMesh.rotation.set(Math.PI/2,Math.PI,0);
-
     postMesh.translateX(x);
-    postMesh.translateY(30);
-    postMesh.translateZ(y);
-
+    postMesh.translateY(y);
+    postMesh.translateZ(30);
+    
+    postMesh.rotation.set(Math.PI/2,0,0);
+    
     let post = Matter.Bodies.circle(x, y, 15, { isStatic: true });
 
     return { mesh: postMesh, phys: post };

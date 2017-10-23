@@ -10,10 +10,10 @@ function initplayer(players, playerId){
     const batGeo = new BoxBufferGeometry(100,10,30);
 
     const playerMesh = new Mesh( batGeo, batCol );
-    playerMesh.rotation.set(0,0,((2*Math.PI)/players) * playerId);
+    playerMesh.rotation.z = ((2*Math.PI)/players) * playerId;
     playerMesh.translateZ(30);
     playerMesh.translateY(220);
-
+    
     const player = Matter.Bodies.rectangle(0, 0, 100, 10, {isStatic: true});
     Matter.Body.setPosition(player, { x: playerMesh.position.x, y: playerMesh.position.y });
     Matter.Body.setAngle(player, playerMesh.rotation.z);
