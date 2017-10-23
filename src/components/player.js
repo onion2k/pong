@@ -18,7 +18,11 @@ function initplayer(players, playerId){
     Matter.Body.setPosition(player, { x: playerMesh.position.x, y: playerMesh.position.y });
     Matter.Body.setAngle(player, playerMesh.rotation.z);
 
-    return { mesh: playerMesh, phys: player }
+    const pvec = { x: Math.cos(player.angle) * 200, y: Math.sin(player.angle) * 200};
+    const minbounds = Matter.Vector.sub(player.position, pvec);
+    const maxbounds = Matter.Vector.add(player.position, pvec);
+    
+    return { mesh: playerMesh, phys: player, bounds: { min: minbounds, max: maxbounds } }
 
 }
 

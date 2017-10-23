@@ -60,6 +60,13 @@ function init() {
     scene.add(player.mesh);
     World.add(engine.world, player.phys);
 
+    var post = new arenapost(player.bounds.min.x, player.bounds.min.y);
+    scene.add(post.mesh);
+    World.add(engine.world, post.phys);
+
+    var post = new arenapost(player.bounds.max.x, player.bounds.max.y);
+    scene.add(post.mesh);
+    World.add(engine.world, post.phys);
 
     for (var x=0;x<12;x++) {
         var px = x%4;
