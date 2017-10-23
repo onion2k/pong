@@ -22,7 +22,7 @@ var Engine = Matter.Engine,
     Render = Matter.Render,
     Bodies = Matter.Bodies;
 
-    const game = {
+const game = {
     gravity: 0,
     speed: settings.player.speed,
     timeStep: 1/60,
@@ -56,7 +56,7 @@ function init() {
     scene.add(puck.mesh);
     World.add(engine.world, puck.phys);
 
-    player = initplayer(settings.players, 0);
+    player = initplayer(settings.players, 2);
     scene.add(player.mesh);
     World.add(engine.world, player.phys);
 
