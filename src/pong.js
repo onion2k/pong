@@ -32,6 +32,7 @@ const game = {
 
 var playerVelocity = { x: 0, y: 0};
 let world, engine, scene, player, render;
+let pucks = [];
 
 function init() {
 
@@ -54,8 +55,15 @@ function init() {
     }
 
     scene.add(field);
-    scene.add(puck.mesh);
-    World.add(engine.world, puck.phys);
+
+    pucks.push(puck());
+    pucks.push(puck());
+    pucks.push(puck());
+
+    pucks.forEach((puck)=>{
+        scene.add(puck.mesh);
+        World.add(engine.world, puck.phys);    
+    });
 
     player = initplayer(settings.players, game.playerId);
     scene.add(player.mesh);
@@ -69,10 +77,10 @@ function init() {
     scene.add(post.mesh);
     World.add(engine.world, post.phys);
 
-    for (var x=0;x<12;x++) {
+    for (var x=0;x<16;x++) {
         var px = x%4;
         var py = Math.floor(x/4);
-        var post = new arenapost(120 - (px*80), 80 - (py*80));
+        var post = new arenapost(150 - (px*100), 150 - (py*100));
         scene.add(post.mesh);
         World.add(engine.world, post.phys);
     }
@@ -119,11 +127,13 @@ function animate() {
     Matter.Body.translate(player.phys, playerVelocity);
 
     player.mesh.position.set(player.phys.position.x, player.phys.position.y, 0);
-    puck.mesh.position.set(puck.phys.position.x, puck.phys.position.y, 13);
 
-    if (Matter.Vector.magnitude(puck.phys.velocity) < 8) {
-        Matter.Body.setVelocity(puck.phys, Matter.Vector.mult(puck.phys.velocity, 1.01));
-    }
+    pucks.forEach((puck)=>{
+        puck.mesh.position.set(puck.phys.position.x, puck.phys.position.y, 13);
+        if (Matter.Vector.magnitude(puck.phys.velocity) < 8) {
+            Matter.Body.setVelocity(puck.phys, Matter.Vector.mult(puck.phys.velocity, 1.01));
+        }
+    });
 
     render3D();
     requestAnimationFrame( animate );
@@ -132,7 +142,9 @@ function animate() {
 
 setTimeout(function(){
 
-    Matter.Body.applyForce(puck.phys, puck.phys.position, { x: 0.005, y: 0.01 });
+    pucks.forEach((puck)=>{
+        Matter.Body.applyForce(puck.phys, puck.phys.position, { x: Math.random() * 0.001, y: 0.01 });
+    });
 
 }, 500);
 
