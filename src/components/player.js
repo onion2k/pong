@@ -11,7 +11,6 @@ function initplayer(players, playerId){
 
     const playerMesh = new Mesh( batGeo, batCol );
     playerMesh.rotation.z = ((2*Math.PI)/players) * playerId;
-    playerMesh.translateZ(30);
     playerMesh.translateY(220);
     
     const player = Matter.Bodies.rectangle(0, 0, 100, 10, {isStatic: true});

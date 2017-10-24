@@ -26,7 +26,7 @@ const game = {
     gravity: 0,
     speed: settings.player.speed,
     timeStep: 1/60,
-    debug: true,
+    debug: false,
     playerId: 0
 }
 
@@ -99,7 +99,7 @@ function init() {
     scene.add( amblight );
     
     let pointlight = new PointLight( 0xffffff, 1, 2500 );
-    pointlight.position.set( 250, 250, 500 );
+    pointlight.position.set( 250, 250, -500 );
     scene.add( pointlight );
 
     let container = document.createElement( 'div' );
@@ -118,8 +118,8 @@ function animate() {
 
     Matter.Body.translate(player.phys, playerVelocity);
 
-    player.mesh.position.set(player.phys.position.x, player.phys.position.y, 30);
-    puck.mesh.position.set(puck.phys.position.x, puck.phys.position.y, 30);
+    player.mesh.position.set(player.phys.position.x, player.phys.position.y, 0);
+    puck.mesh.position.set(puck.phys.position.x, puck.phys.position.y, 13);
 
     if (Matter.Vector.magnitude(puck.phys.velocity) < 8) {
         Matter.Body.setVelocity(puck.phys, Matter.Vector.mult(puck.phys.velocity, 1.01));
@@ -145,7 +145,7 @@ function render3D() {
 init();
 animate();
 
-let i = 1;
+let i = -1;
 
 document.addEventListener('keydown', (e)=>{
     switch (e.keyCode) {

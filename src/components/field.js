@@ -7,5 +7,6 @@ const fieldGeo = new CylinderBufferGeometry(400,400,30,64);
 const fieldMesh = new Mesh( fieldGeo, fieldCol );
 
 fieldMesh.rotation.set(Math.PI/2,0,0);
+fieldMesh.translateY(30);
 
 export default fieldMesh;

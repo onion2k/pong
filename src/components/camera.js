@@ -6,15 +6,27 @@ const cameraTarget = new Object3D();
 cameraTarget.position.set(0,0,0);
 cameraTarget.rotation.set(0,0,0);
 
-const camera = new PerspectiveCamera( 70, 800/600, 1, 5000 );
-// const camera = new OrthographicCamera( -500, 500, -400, 400, 1, 5000 );
+let camera;
+
+if (1) {
+
+    camera = new PerspectiveCamera( 70, 800/600, 1, 5000 );
+    
+    cameraTarget.rotation.x = (Math.PI/2) * 0.25;
+    cameraTarget.rotation.y = 0;
+    cameraTarget.rotation.z = Math.PI;
+
+} else {
+
+    camera = new OrthographicCamera( 500, -500, -400, 400, 1, 5000 );
+
+}
+
 camera.position.x = 0;
-camera.position.y = -200;
-camera.position.z = 700;
+camera.position.y = 0;
+camera.position.z = -700;
 
 cameraTarget.add(camera);
 camera.lookAt(cameraTarget.position);
-
-cameraTarget.rotation.z = Math.PI;
 
 export default { handle: cameraTarget, camera: camera };
