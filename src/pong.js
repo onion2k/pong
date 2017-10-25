@@ -48,8 +48,8 @@ function init() {
             engine: engine,
             hasBounds: true,
             bounds: {
-                min: {x: -500, y: -400 },
-                max: {x: 500, y: 400 }
+                min: { x: -500, y: -400 },
+                max: { x: 500, y: 400 }
             }
         });
     }

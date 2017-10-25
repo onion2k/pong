@@ -6,7 +6,7 @@ import { MeshPhongMaterial } from '../../node_modules/three/src/materials/MeshPh
 
 function initplayer(players, playerId){
 
-    const batCol = new MeshPhongMaterial({ color: "#ff00ff", shininess: 0 });
+    const batCol = new MeshPhongMaterial({ color: "#444444", shininess: 0 });
     const batGeo = new BoxBufferGeometry(100,10,30);
 
     const playerMesh = new Mesh( batGeo, batCol );

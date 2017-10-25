@@ -30,7 +30,7 @@ function arenawall(){
     const length = 400;
     const width = 10;
 
-    const wallCol = new MeshPhongMaterial({ color: "#ff0000", shininess: 0 });
+    const wallCol = new MeshPhongMaterial({ color: "#cccccc", shininess: 0 });
     const wallGeo = new BoxBufferGeometry(length,width,30);
     const wallMesh = new Mesh( wallGeo, wallCol );
     
