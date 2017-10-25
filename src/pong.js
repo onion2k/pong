@@ -27,12 +27,14 @@ const game = {
     speed: settings.player.speed,
     timeStep: 1/60,
     debug: false,
-    playerId: 0
+    playerId: 0,
+    arenaSize: 50*settings.players
 }
 
 var playerVelocity = { x: 0, y: 0};
 let world, engine, scene, player, render;
 let pucks = [];
+let posts = [];
 
 function init() {
 
@@ -65,7 +67,7 @@ function init() {
         World.add(engine.world, puck.phys);    
     });
 
-    player = initplayer(settings.players, game.playerId);
+    player = initplayer(settings.players, game.playerId, game.arenaSize);
     scene.add(player.mesh);
     World.add(engine.world, player.phys);
 
@@ -80,10 +82,14 @@ function init() {
     for (var x=0;x<16;x++) {
         var px = x%4;
         var py = Math.floor(x/4);
-        var post = new arenapost(150 - (px*100), 150 - (py*100));
-        scene.add(post.mesh);
-        World.add(engine.world, post.phys);
+        var post = new arenapost(120 - (px*80), 120 - (py*80));
+        posts.push(post);
     }
+
+    posts.forEach((post)=>{
+        scene.add(post.mesh);
+        World.add(engine.world, post.phys);    
+    });
 
     for (var x=0; x<settings.players; x++) {
 
