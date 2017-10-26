@@ -12,7 +12,10 @@ function initplayer(players, playerId, arenaSize){
     const playerMesh = new Mesh( batGeo, batCol );
     playerMesh.rotation.z = ((2*Math.PI)/players) * playerId;
     playerMesh.translateY(arenaSize - 30);
-    
+
+    playerMesh.castShadow = true; //default is false
+    playerMesh.receiveShadow = false; //default
+
     const player = Matter.Bodies.rectangle(0, 0, 100, 10, {isStatic: true});
     Matter.Body.setPosition(player, { x: playerMesh.position.x, y: playerMesh.position.y });
     Matter.Body.setAngle(player, playerMesh.rotation.z);

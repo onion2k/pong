@@ -12,7 +12,7 @@ if (1) {
 
     camera = new PerspectiveCamera( 70, 800/600, 1, 5000 );
     
-    cameraTarget.rotation.x = (Math.PI/2) * 0.2;
+    cameraTarget.rotation.x = (Math.PI/2) * 0.33;
     cameraTarget.rotation.y = 0;
     cameraTarget.rotation.z = Math.PI;
 

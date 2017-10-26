@@ -11,6 +11,9 @@ function arenapost(x, y){
     const postGeo = new CylinderBufferGeometry(15,15,20,16);
     const postMesh = new Mesh( postGeo, postCol );
 
+    postMesh.castShadow = true; //default is false
+    postMesh.receiveShadow = true; //default
+    
     postMesh.rotation.set(Math.PI,0,0);
     
     postMesh.position.x = x;
@@ -33,7 +36,10 @@ function arenawall(){
     const wallCol = new MeshPhongMaterial({ color: "#cccccc", shininess: 0 });
     const wallGeo = new BoxBufferGeometry(length,width,30);
     const wallMesh = new Mesh( wallGeo, wallCol );
-    
+
+    wallMesh.castShadow = true; //default is false
+    wallMesh.receiveShadow = false; //default
+
     const wallPhys = Matter.Bodies.rectangle(0, 0, length, width, {isStatic: true });
     
     return { mesh: wallMesh, phys: wallPhys };

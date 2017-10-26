@@ -5,7 +5,8 @@ import { Scene } from '../node_modules/three/src/scenes/Scene';
 import { WebGLRenderer } from '../node_modules/three/src/renderers/WebGLRenderer';
 import { Vector3 } from '../node_modules/three/src/math/Vector3';
 import { AmbientLight } from '../node_modules/three/src/lights/AmbientLight';
-import { PointLight } from '../node_modules/three/src/lights/PointLight';
+import { SpotLight } from '../node_modules/three/src/lights/SpotLight';
+import { CameraHelper } from '../node_modules/three/src/helpers/CameraHelper';
 import { Object3D } from '../node_modules/three/src/core/Object3D';
 
 import settings from './components/settings';
@@ -35,6 +36,7 @@ var playerVelocity = { x: 0, y: 0};
 let world, engine, scene, player, render;
 let pucks = [];
 let posts = [];
+let lightHandle;
 
 function init() {
 
@@ -112,11 +114,27 @@ function init() {
 
     let amblight = new AmbientLight( 0x808080 );
     scene.add( amblight );
-    
-    let pointlight = new PointLight( 0xffffff, 1, 2500 );
-    pointlight.position.set( 250, 250, -500 );
-    scene.add( pointlight );
 
+    lightHandle = new Object3D();
+    lightHandle.position.set(0,0,0);
+    lightHandle.rotation.set(0,0,0);
+
+    //Create a DirectionalLight and turn on shadows for the light
+    var light = new SpotLight( 0xffffff );
+    light.position.set( 200, -200, -400 );
+    
+    light.castShadow = true;
+    
+    light.shadow.mapSize.width = 2048;
+    light.shadow.mapSize.height = 2048;
+    
+    light.shadow.camera.near = 500;
+    light.shadow.camera.far = 4000;
+    light.shadow.camera.fov = 70;
+    
+    lightHandle.add(light);
+    scene.add(lightHandle);
+    
     let container = document.createElement( 'div' );
     document.body.appendChild( container );
     container.appendChild( renderer.domElement );
@@ -126,12 +144,14 @@ function init() {
     if (game.debug) {
         Render.run(render);
     }
-    
+
 }
 
 function animate() {
 
     Matter.Body.translate(player.phys, playerVelocity);
+
+    lightHandle.rotation.z += 0.001;
 
     player.mesh.position.set(player.phys.position.x, player.phys.position.y, 0);
 

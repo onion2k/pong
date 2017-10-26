@@ -11,7 +11,10 @@ function puck() {
     const ballGeo = new CylinderBufferGeometry(size,size,5,16);
     const ballMesh = new Mesh( ballGeo, ballCol );
     ballMesh.rotation.set(Math.PI/2,0,0);
-    
+
+    ballMesh.castShadow = true; //default is false
+    ballMesh.receiveShadow = false; //default
+
     const ball = Matter.Bodies.circle(0, 0, size, {
         friction: 0.0,
         frictionAir: 0.0,
