@@ -83,6 +83,7 @@ function init() {
         var px = x%4;
         var py = Math.floor(x/4);
         var post = new arenapost(120 - (px*80), 120 - (py*80));
+        post.v = x;
         posts.push(post);
     }
 
@@ -134,6 +135,16 @@ function animate() {
 
     player.mesh.position.set(player.phys.position.x, player.phys.position.y, 0);
 
+    posts.forEach((post)=>{
+        post.v += 0.01;
+        post.mesh.position.z = 24 - Math.abs(Math.sin(post.v) * 24);
+        if (post.mesh.position.z > 20) {
+            post.phys.isSensor = true;
+        } else {
+            post.phys.isSensor = false;
+        }
+    });
+        
     pucks.forEach((puck)=>{
         puck.mesh.position.set(puck.phys.position.x, puck.phys.position.y, 13);
         if (Matter.Vector.magnitude(puck.phys.velocity) < 8) {
