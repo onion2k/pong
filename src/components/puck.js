@@ -2,15 +2,16 @@ import Matter from 'matter-js';
 
 import { Mesh } from '../../node_modules/three/src/objects/Mesh';
 import { CylinderBufferGeometry } from '../../node_modules/three/src/geometries/CylinderGeometry';
-import { MeshPhongMaterial } from '../../node_modules/three/src/materials/MeshPhongMaterial';
+import { MeshPhysicalMaterial } from '../../node_modules/three/src/materials/MeshPhysicalMaterial';
 
 let pucks = 0;
+
+const ballCol = new MeshPhysicalMaterial({ color: "#FF4444", roughness: 1 });
 
 function puck() {
 
     const size = 8;
     const id = "puck-"+(++pucks);
-    const ballCol = new MeshPhongMaterial({ color: "#ffffff", shininess: 0 });
     const ballGeo = new CylinderBufferGeometry(size,size,5,16);
     const ballMesh = new Mesh( ballGeo, ballCol );
     ballMesh.rotation.set(Math.PI/2,0,0);

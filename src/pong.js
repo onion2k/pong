@@ -143,24 +143,14 @@ function init() {
 
     Engine.run(engine);
     
-    // an example of using collisionStart event on an engine
     Matter.Events.on(engine, 'collisionStart', function(event) {
         var pairs = event.pairs;
-
-        // change object colours to show those starting a collision
         for (var i = 0; i < pairs.length; i++) {
             var pair = pairs[i];
-            //console.log(pair.bodyA.label, pair.bodyB.label)
-            pair.bodyA.render.fillStyle = '#333';
-            pair.bodyB.render.fillStyle = '#333';
-
-            // console.log(pair.bodyB.label)
-
             if (pair.bodyB._type==='post') {
                 let p = posts.find((post)=>{ return post.id===pair.bodyB.label });
                 p.contact = true;
             }
-
         }
     });
 
@@ -174,7 +164,7 @@ function animate() {
 
     Matter.Body.translate(player.phys, playerVelocity);
 
-    lightHandle.rotation.z += 0.001;
+    // lightHandle.rotation.z += 0.001;
 
     player.mesh.position.set(player.phys.position.x, player.phys.position.y, 0);
 

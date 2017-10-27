@@ -2,11 +2,12 @@ import Matter from 'matter-js';
 
 import { Mesh } from '../../node_modules/three/src/objects/Mesh';
 import { BoxBufferGeometry } from '../../node_modules/three/src/geometries/BoxGeometry';
-import { MeshPhongMaterial } from '../../node_modules/three/src/materials/MeshPhongMaterial';
+import { MeshPhysicalMaterial } from '../../node_modules/three/src/materials/MeshPhysicalMaterial';
+
+const batCol = new MeshPhysicalMaterial({ color: "#AAAAFF", roughness: 1 });
 
 function initplayer(players, playerId, arenaSize){
 
-    const batCol = new MeshPhongMaterial({ color: "#444444", shininess: 0 });
     const batGeo = new BoxBufferGeometry(100,10,30);
 
     const playerMesh = new Mesh( batGeo, batCol );

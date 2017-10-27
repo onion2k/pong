@@ -3,14 +3,16 @@ import Matter from 'matter-js';
 import { Mesh } from '../../node_modules/three/src/objects/Mesh';
 import { BoxBufferGeometry } from '../../node_modules/three/src/geometries/BoxGeometry';
 import { CylinderBufferGeometry } from '../../node_modules/three/src/geometries/CylinderGeometry';
-import { MeshPhongMaterial } from '../../node_modules/three/src/materials/MeshPhongMaterial';
+import { MeshPhysicalMaterial } from '../../node_modules/three/src/materials/MeshPhysicalMaterial';
 
 let posts = 0;
 let walls = 0;
 
+const postCol = new MeshPhysicalMaterial({ color: "#AAFFFF", roughness: 1 });
+const wallCol = new MeshPhysicalMaterial({ color: "#FFAAAA", roughness: 1 });
+
 function arenapost(x, y){
 
-    const postCol = new MeshPhongMaterial({ color: "#888888", shininess: 0 });
     const postGeo = new CylinderBufferGeometry(15,15,20,16);
     const postMesh = new Mesh( postGeo, postCol );
     const id = "post-"+(++posts);
@@ -37,7 +39,6 @@ function arenawall(){
     const length = 400;
     const width = 10;
 
-    const wallCol = new MeshPhongMaterial({ color: "#cccccc", shininess: 0 });
     const wallGeo = new BoxBufferGeometry(length,width,30);
     const wallMesh = new Mesh( wallGeo, wallCol );
 
