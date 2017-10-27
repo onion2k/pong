@@ -5,11 +5,15 @@ import { BoxBufferGeometry } from '../../node_modules/three/src/geometries/BoxGe
 import { CylinderBufferGeometry } from '../../node_modules/three/src/geometries/CylinderGeometry';
 import { MeshPhongMaterial } from '../../node_modules/three/src/materials/MeshPhongMaterial';
 
+let posts = 0;
+let walls = 0;
+
 function arenapost(x, y){
 
     const postCol = new MeshPhongMaterial({ color: "#888888", shininess: 0 });
     const postGeo = new CylinderBufferGeometry(15,15,20,16);
     const postMesh = new Mesh( postGeo, postCol );
+    const id = "post-"+(++posts);
 
     postMesh.castShadow = true; //default is false
     postMesh.receiveShadow = true; //default
@@ -22,9 +26,9 @@ function arenapost(x, y){
 
     postMesh.rotation.set(Math.PI/2,0,0);
 
-    let post = Matter.Bodies.circle(x, y, 15, { isStatic: true });
+    let post = Matter.Bodies.circle(x, y, 15, { isStatic: true, label: id, _type: 'post' });
 
-    return { mesh: postMesh, phys: post };
+    return { mesh: postMesh, phys: post, id: id };
 
 }
 

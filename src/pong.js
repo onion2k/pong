@@ -74,10 +74,12 @@ function init() {
     World.add(engine.world, player.phys);
 
     var post = new arenapost(player.bounds.min.x, player.bounds.min.y);
+    post.phys._type = 'playerbound';
     scene.add(post.mesh);
     World.add(engine.world, post.phys);
 
     var post = new arenapost(player.bounds.max.x, player.bounds.max.y);
+    post.phys._type = 'playerbound';
     scene.add(post.mesh);
     World.add(engine.world, post.phys);
 
@@ -85,13 +87,13 @@ function init() {
         var px = x%4;
         var py = Math.floor(x/4);
         var post = new arenapost(120 - (px*80), 120 - (py*80));
-        post.v = x;
+        post.v = 90;
         posts.push(post);
     }
 
     posts.forEach((post)=>{
         scene.add(post.mesh);
-        World.add(engine.world, post.phys);    
+        var w = World.add(engine.world, post.phys);    
     });
 
     for (var x=0; x<settings.players; x++) {
@@ -140,6 +142,27 @@ function init() {
     container.appendChild( renderer.domElement );
 
     Engine.run(engine);
+    
+    // an example of using collisionStart event on an engine
+    Matter.Events.on(engine, 'collisionStart', function(event) {
+        var pairs = event.pairs;
+
+        // change object colours to show those starting a collision
+        for (var i = 0; i < pairs.length; i++) {
+            var pair = pairs[i];
+            //console.log(pair.bodyA.label, pair.bodyB.label)
+            pair.bodyA.render.fillStyle = '#333';
+            pair.bodyB.render.fillStyle = '#333';
+
+            // console.log(pair.bodyB.label)
+
+            if (pair.bodyB._type==='post') {
+                let p = posts.find((post)=>{ return post.id===pair.bodyB.label });
+                p.contact = true;
+            }
+
+        }
+    });
 
     if (game.debug) {
         Render.run(render);
@@ -156,12 +179,19 @@ function animate() {
     player.mesh.position.set(player.phys.position.x, player.phys.position.y, 0);
 
     posts.forEach((post)=>{
-        post.v += 0.01;
-        post.mesh.position.z = 24 - Math.abs(Math.sin(post.v) * 24);
-        if (post.mesh.position.z > 20) {
-            post.phys.isSensor = true;
-        } else {
-            post.phys.isSensor = false;
+        if (post.contact===true) {
+            post.v += 0.1;
+            post.mesh.position.z = 24 - Math.abs(Math.sin(post.v) * 24);
+            if (post.mesh.position.z > 22) {
+                post.contact = false;
+                // post.phys.isSensor = true;
+                if (post.phys) {
+                    Matter.Composite.remove(engine.world, post.phys);
+                    post.phys = undefined;
+                }
+            } else {
+                // post.phys.isSensor = false;
+            }
         }
     });
         
