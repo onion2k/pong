@@ -15,6 +15,9 @@ import field from './components/field';
 import puck from './components/puck';
 import { arenapost, arenawall } from './components/arena';
 
+
+
+
 import Peer from 'peerjs';
 
 let id = localStorage.getItem('player-id');
@@ -25,7 +28,7 @@ peer.on('open', function(id) {
 
     console.log('My peer ID is: ' + id);
 
-    if (id!=='player-1') {
+    if (id !== 'player-1') {
 
         var conn = peer.connect('player-1');
         
@@ -58,6 +61,8 @@ peer.on('open', function(id) {
     });
 
 });
+
+
 
 import renderer from './components/render';
 import camera from './components/camera';
