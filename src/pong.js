@@ -16,13 +16,11 @@ import puck from './components/puck';
 import { arenapost, arenawall } from './components/arena';
 
 
-
-
 import Peer from 'peerjs';
 
+let conn;
 let id = localStorage.getItem('player-id');
-
-var peer = new Peer(id, {key: 'xbvdscgdfedsra4i'});
+let peer = new Peer(id, {key: 'xbvdscgdfedsra4i'});
 
 peer.on('open', function(id) {
 
@@ -30,7 +28,7 @@ peer.on('open', function(id) {
 
     if (id !== 'player-1') {
 
-        var conn = peer.connect('player-1');
+        conn = peer.connect('player-1');
         
         conn.on('open', function(id) {
         
@@ -40,12 +38,7 @@ peer.on('open', function(id) {
             conn.on('data', function(data) {
                 console.log('Received', data);
             });
-        
-            // Send messages
-            conn.send('Hello 1!');
-            conn.send('Hello 2!');
-            conn.send('Hello 3!');
-            
+
         });
 
     }
@@ -55,12 +48,13 @@ peer.on('open', function(id) {
         console.log('My peer ID is: ' + conn.id, conn.peer);
         
         conn.on('data', function(data) {
-            console.log('Received', data);
+            console.log('Received', conn.peer, data);
         });
 
     });
 
 });
+
 
 
 
@@ -77,7 +71,7 @@ const game = {
     speed: settings.player.speed,
     timeStep: 1/60,
     debug: false,
-    playerId: 0,
+    playerId: 1,
     arenaSize: 50*settings.players
 }
 
@@ -269,10 +263,12 @@ document.addEventListener('keydown', (e)=>{
     switch (e.keyCode) {
         case 37:
            playerVelocity = { x: Math.cos(player.phys.angle) * game.speed * i * 1, y: Math.sin(player.phys.angle) * game.speed * i * 1 };
+           conn.send({'v': playerVelocity});
            //Matter.Body.setVelocity(player, playerVelocity);
            break;
         case 39:
            playerVelocity = { x: Math.cos(player.phys.angle) * game.speed * i * -1, y: Math.sin(player.phys.angle) * game.speed * i  * -1 };
+           conn.send({'v': playerVelocity});
            //Matter.Body.setVelocity(player, playerVelocity);
         break;
     }
