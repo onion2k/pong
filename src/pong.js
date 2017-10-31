@@ -15,6 +15,50 @@ import field from './components/field';
 import puck from './components/puck';
 import { arenapost, arenawall } from './components/arena';
 
+import Peer from 'peerjs';
+
+let id = localStorage.getItem('player-id');
+
+var peer = new Peer(id, {key: 'xbvdscgdfedsra4i'});
+
+peer.on('open', function(id) {
+
+    console.log('My peer ID is: ' + id);
+
+    if (id!=='player-1') {
+
+        var conn = peer.connect('player-1');
+        
+        conn.on('open', function(id) {
+        
+            // Receive messages
+            console.log('My peer ID is: ' + conn.id, conn.peer);
+        
+            conn.on('data', function(data) {
+                console.log('Received', data);
+            });
+        
+            // Send messages
+            conn.send('Hello 1!');
+            conn.send('Hello 2!');
+            conn.send('Hello 3!');
+            
+        });
+
+    }
+
+    peer.on('connection', function(conn) { 
+
+        console.log('My peer ID is: ' + conn.id, conn.peer);
+        
+        conn.on('data', function(data) {
+            console.log('Received', data);
+        });
+
+    });
+
+});
+
 import renderer from './components/render';
 import camera from './components/camera';
 
