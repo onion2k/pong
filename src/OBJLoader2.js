@@ -836,7 +836,7 @@ let OBJLoader2 = (function () {
 		MeshCreator.prototype.setMaterials = function ( materials ) {
 			this.materials = Validator.verifyInput( materials, this.materials );
 			this.materials = Validator.verifyInput( this.materials, { materials: [] } );
-
+            
 			var defaultMaterial = this.materials[ 'defaultMaterial' ];
 			if ( ! defaultMaterial ) {
 
@@ -944,7 +944,7 @@ let OBJLoader2 = (function () {
 				rawObjectDescription = rawObjectDescriptions[ oodIndex ];
 
 				materialName = rawObjectDescription.materialName;
-				material = colorBA ? this.materials[ 'vertexColorMaterial' ] : this.materials[ materialName ];
+                material = colorBA ? this.materials[ 'vertexColorMaterial' ] : this.materials.materials[ materialName ];
 				if ( ! material ) {
 
 					material = this.materials[ 'defaultMaterial' ];

@@ -15,9 +15,11 @@ import field from './components/field';
 import puck from './components/puck';
 import { arenapost, arenawall } from './components/arena';
 
+import { MTLLoader } from "./MTLLoader";
+let mtlLoader = new MTLLoader;
+    
 import { OBJLoader2 } from "./OBJLoader2";
 let loader = new OBJLoader2;
-loader.setPath( 'burger/' );
 
 import Peer from 'peerjs';
 
@@ -169,7 +171,7 @@ function init() {
 
     //Create a DirectionalLight and turn on shadows for the light
     var light = new SpotLight( 0xffffff );
-    light.position.set( 200, -200, -400 );
+    light.position.set( 400, -400, -800 );
     
     light.castShadow = true;
     
@@ -210,7 +212,7 @@ function animate() {
 
     Matter.Body.translate(player.phys, playerVelocity);
 
-    // lightHandle.rotation.z += 0.001;
+    // lightHandle.rotation.z += 0.1;
 
     player.mesh.position.set(player.phys.position.x, player.phys.position.y, 0);
 
@@ -238,6 +240,8 @@ function animate() {
         }
     });
 
+    burger.rotation.y += 0.01;
+
     render3D();
     requestAnimationFrame( animate );
 
@@ -258,17 +262,26 @@ function render3D() {
 }
 
 init();
-animate();
 
-loader.load('Hamburger.obj', (burger) => {
-    console.log("Burger loaded");
-    burger.scale.set(10,10,10);
-    burger.rotation.set(-Math.PI/2,0,0);
-    scene.add(burger);
-}, (xhr) => {
-    console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-}, (error) => {
-    console.log( 'An error happened', error );
+let burger;
+
+mtlLoader.setPath('burger/');
+mtlLoader.load('Hamburger.mtl', function(materials) {
+    materials.preload();
+    loader.setMaterials(materials);
+    loader.setPath( 'burger/' );
+    loader.load('Hamburger.obj', (obj) => {
+        burger = obj;
+        burger.scale.set(30,30,30);
+        burger.rotation.set(-Math.PI/2,0,0);
+        scene.add(burger);
+        animate();
+    }, (xhr) => {
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    }, (error) => {
+        console.log( 'An error happened', error );
+    });
+    
 });
 
 let i = -1;
