@@ -15,6 +15,9 @@ import field from './components/field';
 import puck from './components/puck';
 import { arenapost, arenawall } from './components/arena';
 
+import { OBJLoader2 } from "./OBJLoader2";
+let loader = new OBJLoader2;
+loader.setPath( 'burger/' );
 
 import Peer from 'peerjs';
 
@@ -71,7 +74,7 @@ const game = {
     speed: settings.player.speed,
     timeStep: 1/60,
     debug: false,
-    playerId: 1,
+    playerId: 0,
     arenaSize: 50*settings.players
 }
 
@@ -256,6 +259,17 @@ function render3D() {
 
 init();
 animate();
+
+loader.load('Hamburger.obj', (burger) => {
+    console.log("Burger loaded");
+    burger.scale.set(10,10,10);
+    burger.rotation.set(-Math.PI/2,0,0);
+    scene.add(burger);
+}, (xhr) => {
+    console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+}, (error) => {
+    console.log( 'An error happened', error );
+});
 
 let i = -1;
 
