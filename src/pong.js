@@ -113,6 +113,7 @@ function init() {
     pucks.push(puck());
 
     pucks.forEach((puck)=>{
+        puck.mesh = burger.clone();
         scene.add(puck.mesh);
         World.add(engine.world, puck.phys);    
     });
@@ -234,13 +235,15 @@ function animate() {
     });
         
     pucks.forEach((puck)=>{
-        puck.mesh.position.set(puck.phys.position.x, puck.phys.position.y, 13);
+        puck.mesh.position.set(puck.phys.position.x, puck.phys.position.y, 10);
+        puck.mesh.rotation.y = puck.phys.angle;
+
         if (Matter.Vector.magnitude(puck.phys.velocity) < 8) {
             Matter.Body.setVelocity(puck.phys, Matter.Vector.mult(puck.phys.velocity, 1.01));
         }
     });
 
-    burger.rotation.y += 0.01;
+    // burger.rotation.y += 0.01;
 
     render3D();
     requestAnimationFrame( animate );
@@ -261,8 +264,6 @@ function render3D() {
 
 }
 
-init();
-
 let burger;
 
 mtlLoader.setPath('burger/');
@@ -272,9 +273,9 @@ mtlLoader.load('Hamburger.mtl', function(materials) {
     loader.setPath( 'burger/' );
     loader.load('Hamburger.obj', (obj) => {
         burger = obj;
-        burger.scale.set(30,30,30);
+        burger.scale.set(3,3,3);
         burger.rotation.set(-Math.PI/2,0,0);
-        scene.add(burger);
+        init();
         animate();
     }, (xhr) => {
         console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
