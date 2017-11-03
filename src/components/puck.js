@@ -8,18 +8,14 @@ let pucks = 0;
 
 const ballCol = new MeshPhysicalMaterial({ color: "#FF4444", roughness: 1 });
 
-function puck() {
+function puck(mesh) {
 
-    const size = 8;
+    const size = 1.5;
     const id = "puck-"+(++pucks);
-    const ballGeo = new CylinderBufferGeometry(size,size,5,16);
-    const ballMesh = new Mesh( ballGeo, ballCol );
-    ballMesh.rotation.set(Math.PI/2,0,0);
 
-    ballMesh.castShadow = true; //default is false
-    ballMesh.receiveShadow = false; //default
+    mesh.scale.set(size*3,size*3,size*3);
 
-    const ball = Matter.Bodies.circle(0, 0, size, {
+    const ball = Matter.Bodies.circle(0, 0, size*8, {
         friction: 0.0,
         frictionAir: 0.0,
         frictionStatic: 0,
@@ -29,7 +25,7 @@ function puck() {
         label: id
     });
 
-    return { mesh: ballMesh, phys: ball, id: id };
+    return { mesh: mesh, phys: ball, id: id };
 }
 
 

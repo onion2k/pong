@@ -6,6 +6,7 @@
 'use strict';
 
 import { DefaultLoadingManager } from '../node_modules/three/src/loaders/LoadingManager'; 
+
 import { FileLoader } from '../node_modules/three/src/loaders/FileLoader';
 import { Group } from '../node_modules/three/src/objects/Group';
 import { MeshStandardMaterial } from '../node_modules/three/src/materials/MeshStandardMaterial';
@@ -14,6 +15,8 @@ import { VertexColors } from '../node_modules/three/src/constants';
 import { BufferGeometry } from '../node_modules/three/src/core/BufferGeometry';
 import { BufferAttribute } from '../node_modules/three/src/core/BufferAttribute';
 import { Mesh } from '../node_modules/three/src/objects/Mesh';
+
+DefaultLoadingManager.onLoad = function() { console.log('Done') }
 
 let OBJLoader2 = (function () {
 
@@ -944,7 +947,7 @@ let OBJLoader2 = (function () {
 				rawObjectDescription = rawObjectDescriptions[ oodIndex ];
 
 				materialName = rawObjectDescription.materialName;
-                material = colorBA ? this.materials[ 'vertexColorMaterial' ] : this.materials.materials[ materialName ];
+                material = colorBA ? this.materials[ 'vertexColorMaterial' ] : this.materials[ materialName ];
 				if ( ! material ) {
 
 					material = this.materials[ 'defaultMaterial' ];

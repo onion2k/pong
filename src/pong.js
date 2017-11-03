@@ -1,5 +1,7 @@
 import Matter from 'matter-js';
 
+import { DefaultLoadingManager } from '../node_modules/three/src/loaders/LoadingManager';
+
 import { PerspectiveCamera } from '../node_modules/three/src/cameras/PerspectiveCamera';
 import { Scene } from '../node_modules/three/src/scenes/Scene';
 import { WebGLRenderer } from '../node_modules/three/src/renderers/WebGLRenderer';
@@ -16,49 +18,50 @@ import puck from './components/puck';
 import { arenapost, arenawall } from './components/arena';
 
 import { MTLLoader } from "./MTLLoader";
-let mtlLoader = new MTLLoader;
+let mtlLoader = new MTLLoader(DefaultLoadingManager);
     
 import { OBJLoader2 } from "./OBJLoader2";
-let loader = new OBJLoader2;
+let loader = new OBJLoader2(DefaultLoadingManager);
 
-import Peer from 'peerjs';
 
-let conn;
-let id = localStorage.getItem('player-id');
-let peer = new Peer(id, {key: 'xbvdscgdfedsra4i'});
+// import Peer from 'peerjs';
 
-peer.on('open', function(id) {
+// let conn;
+// let id = localStorage.getItem('player-id');
+// let peer = new Peer(id, {key: 'xbvdscgdfedsra4i'});
 
-    console.log('My peer ID is: ' + id);
+// peer.on('open', function(id) {
 
-    if (id !== 'player-1') {
+//     console.log('My peer ID is: ' + id);
 
-        conn = peer.connect('player-1');
+//     if (id !== 'player-1') {
+
+//         conn = peer.connect('player-1');
         
-        conn.on('open', function(id) {
+//         conn.on('open', function(id) {
         
-            // Receive messages
-            console.log('My peer ID is: ' + conn.id, conn.peer);
+//             // Receive messages
+//             console.log('My peer ID is: ' + conn.id, conn.peer);
         
-            conn.on('data', function(data) {
-                console.log('Received', data);
-            });
+//             conn.on('data', function(data) {
+//                 console.log('Received', data);
+//             });
 
-        });
+//         });
 
-    }
+//     }
 
-    peer.on('connection', function(conn) { 
+//     peer.on('connection', function(conn) { 
 
-        console.log('My peer ID is: ' + conn.id, conn.peer);
+//         console.log('My peer ID is: ' + conn.id, conn.peer);
         
-        conn.on('data', function(data) {
-            console.log('Received', conn.peer, data);
-        });
+//         conn.on('data', function(data) {
+//             console.log('Received', conn.peer, data);
+//         });
 
-    });
+//     });
 
-});
+// });
 
 
 
@@ -85,6 +88,8 @@ let world, engine, scene, player, render;
 let pucks = [];
 let posts = [];
 let lightHandle;
+let burger;
+let coin;
 
 function init() {
 
@@ -108,12 +113,9 @@ function init() {
 
     scene.add(field);
 
-    pucks.push(puck());
-    pucks.push(puck());
-    pucks.push(puck());
+    pucks.push(puck(burger.clone()));
 
     pucks.forEach((puck)=>{
-        puck.mesh = burger.clone();
         scene.add(puck.mesh);
         World.add(engine.world, puck.phys);    
     });
@@ -211,9 +213,9 @@ function init() {
 
 function animate() {
 
-    Matter.Body.translate(player.phys, playerVelocity);
+    let m;
 
-    // lightHandle.rotation.z += 0.1;
+    Matter.Body.translate(player.phys, playerVelocity);
 
     player.mesh.position.set(player.phys.position.x, player.phys.position.y, 0);
 
@@ -238,12 +240,15 @@ function animate() {
         puck.mesh.position.set(puck.phys.position.x, puck.phys.position.y, 10);
         puck.mesh.rotation.y = puck.phys.angle;
 
-        if (Matter.Vector.magnitude(puck.phys.velocity) < 8) {
+        m = Matter.Vector.magnitude(puck.phys.velocity);
+        if (m < 5) {
             Matter.Body.setVelocity(puck.phys, Matter.Vector.mult(puck.phys.velocity, 1.01));
+        } else if (m > 7) {
+            Matter.Body.setVelocity(puck.phys, Matter.Vector.mult(puck.phys.velocity, 0.99));            
         }
     });
 
-    // burger.rotation.y += 0.01;
+    coin.rotation.z += 0.1;
 
     render3D();
     requestAnimationFrame( animate );
@@ -264,26 +269,61 @@ function render3D() {
 
 }
 
-let burger;
 
-mtlLoader.setPath('burger/');
-mtlLoader.load('Hamburger.mtl', function(materials) {
-    materials.preload();
-    loader.setMaterials(materials);
-    loader.setPath( 'burger/' );
-    loader.load('Hamburger.obj', (obj) => {
-        burger = obj;
-        burger.scale.set(3,3,3);
-        burger.rotation.set(-Math.PI/2,0,0);
-        init();
-        animate();
-    }, (xhr) => {
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    }, (error) => {
-        console.log( 'An error happened', error );
+var burgerPromise = new Promise((resolve, reject) => {
+    mtlLoader.setPath('burger/');
+    mtlLoader.load('Hamburger.mtl', function(materials) {
+        materials.preload();
+        loader.setMaterials(materials.materials);
+        loader.setPath( 'burger/' );
+        loader.load('Hamburger.obj', (obj) => {
+            burger = obj;
+            // burger.scale.set(3,3,3);
+            burger.rotation.set(-Math.PI/2,0,0);
+            resolve();
+        }, (xhr) => {
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        }, (error) => {
+            console.log( 'An error happened', error );
+            reject();
+        });
     });
-    
+}).then(() => {
+    var coinPromise = new Promise((resolve, reject) => {
+        mtlLoader.setPath('coin/');
+        mtlLoader.load('CHAHIN_COIN.mtl', function(materials) {
+            materials.preload();
+            loader.setMaterials(materials.materials);
+            loader.setPath( 'coin/' );
+            loader.load('CHAHIN_COIN.obj', (obj) => {
+                coin = obj;
+                coin.scale.set(100,100,100);
+                //coin.rotation.set(-Math.PI/2,0,0);
+                resolve();
+            }, (xhr) => {
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+            }, (error) => {
+                console.log( 'An error happened', error );
+                reject();
+            });
+            
+        });
+    });
 });
+
+DefaultLoadingManager.onLoad = function() {
+    init();
+    animate();
+    scene.add(coin)
+}
+
+// Promise.all([burgerPromise, coinPromise]).then(() => {
+
+//     burger.children[0].material[0].needsUpdate = true;
+//     burger.children[0].material[1].needsUpdate = true;
+//     coin.children[0].material.needsUpdate = true;
+    
+// })
 
 let i = -1;
 
@@ -291,13 +331,11 @@ document.addEventListener('keydown', (e)=>{
     switch (e.keyCode) {
         case 37:
            playerVelocity = { x: Math.cos(player.phys.angle) * game.speed * i * 1, y: Math.sin(player.phys.angle) * game.speed * i * 1 };
-           conn.send({'v': playerVelocity});
-           //Matter.Body.setVelocity(player, playerVelocity);
+           // conn.send({'v': playerVelocity});
            break;
         case 39:
            playerVelocity = { x: Math.cos(player.phys.angle) * game.speed * i * -1, y: Math.sin(player.phys.angle) * game.speed * i  * -1 };
-           conn.send({'v': playerVelocity});
-           //Matter.Body.setVelocity(player, playerVelocity);
+           // conn.send({'v': playerVelocity});
         break;
     }
 });
