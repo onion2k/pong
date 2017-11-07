@@ -300,10 +300,11 @@ const models = [
     { id: 'moon', path: 'moon/', model: 'PUSHILIN_moon.obj', material: 'PUSHILIN_moon.mtl' },
 ]
 
-const concat = list => Array.prototype.concat.bind(list)
-const promiseConcat = f => x => f().then(concat(x))
-const promiseReduce = (acc, x) => acc.then(promiseConcat(x))
-const serial = funcs => funcs.reduce(promiseReduce, Promise.resolve([]))
+//need to understand this better
+const concat = list => Array.prototype.concat.bind(list);
+const promiseConcat = f => x => f().then(concat(x));
+const promiseReduce = (acc, x) => acc.then(promiseConcat(x));
+const serial = funcs => funcs.reduce(promiseReduce, Promise.resolve([]));
 const funcs = models.map(model => () => loadModel(model));
 
 serial(funcs).then((result) => {
