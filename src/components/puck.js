@@ -10,13 +10,13 @@ const ballCol = new MeshPhysicalMaterial({ color: "#FF4444", roughness: 1 });
 
 function puck(mesh) {
 
-    const size = 1.0;
-    const modelFactor = 0.075;
+    const size = 2;
+    const modelFactor = 3;
     const id = "puck-"+(++pucks);
 
     mesh.scale.set(size*modelFactor,size*modelFactor,size*modelFactor);
 
-    const ball = Matter.Bodies.circle(0, 0, size*8, {
+    const ball = Matter.Bodies.circle(0, 0, size*modelFactor*3, {
         friction: 0.0,
         frictionAir: 0.0,
         frictionStatic: 0,

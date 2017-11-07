@@ -281,7 +281,8 @@ function loadModel(model) {
             loader.setMaterials(materials.materials);
             loader.setPath(model.path);
             loader.load(model.model, (obj) => {
-                obj.rotation.set(-Math.PI/2,0,0);
+                obj.scale.set(model.scale, model.scale, model.scale);
+                obj.rotation.set(model.rotation.x, model.rotation.y, model.rotation.z);
                 resolve({ id: model.id, object: obj });
             }, (xhr) => {
                 console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
@@ -295,11 +296,11 @@ function loadModel(model) {
 }
 
 const models = [
-    { id: 'burger', path: 'burger/', model: 'Hamburger.obj', material: 'Hamburger.mtl' },
-    { id: 'coin', path: 'coin/', model: 'CHAHIN_COIN.obj', material: 'CHAHIN_COIN.mtl' },
-    { id: 'moon', path: 'moon/', model: 'PUSHILIN_moon.obj', material: 'PUSHILIN_moon.mtl' },
-    { id: 'guide', path: 'guide/', model: 'RCL01RemoteGuidanceUnit.obj', material: 'RCL01RemoteGuidanceUnit.mtl' },
-    { id: 'roomba', path: 'roomba/', model: 'Domestic Robot.obj', material: 'Domestic Robot.mtl' },
+    { id: 'burger', path: 'burger/', model: 'Hamburger.obj', material: 'Hamburger.mtl', scale: 5, rotation: {x:-Math.PI/2, y:0, z:0} },
+    { id: 'coin', path: 'coin/', model: 'CHAHIN_COIN.obj', material: 'CHAHIN_COIN.mtl', scale: 100, rotation: {x:0, y:0, z:0} },
+    { id: 'moon', path: 'moon/', model: 'PUSHILIN_moon.obj', material: 'PUSHILIN_moon.mtl', scale: 100, rotation: {x:-Math.PI/2, y:0, z:0} },
+    { id: 'guide', path: 'guide/', model: 'RCL01RemoteGuidanceUnit.obj', material: 'RCL01RemoteGuidanceUnit.mtl', scale: 5, rotation: {x:-Math.PI/2, y:0, z:0} },
+    { id: 'roomba', path: 'roomba/', model: 'Domestic Robot.obj', material: 'Domestic Robot.mtl', scale: 5, rotation: {x:-Math.PI/2, y:0, z:0} },
 ]
 
 //need to understand this better
@@ -311,13 +312,11 @@ const funcs = models.map(model => () => loadModel(model));
 
 serial(funcs).then((result) => {
 
-    burger = result[3].object;
+    burger = result[0].object;
 
     coin = result[1].object;
     let moon = result[2].object;
     moonHandle = new Object3D();
-    coin.scale.set(100,100,100);
-    moon.scale.set(100,100,100);
     moon.position.set(200,-200,-400);
     moonHandle.add(moon);
     init();
@@ -326,55 +325,6 @@ serial(funcs).then((result) => {
     scene.add(moonHandle);
 });
 
-
-// var burgerPromise = new Promise((resolve, reject) => {
-//     mtlLoader.setPath('burger/');
-//     mtlLoader.load('Hamburger.mtl', function(materials) {
-//         materials.preload();
-//         loader.setMaterials(materials.materials);
-//         loader.setPath( 'burger/' );
-//         loader.load('Hamburger.obj', (obj) => {
-//             burger = obj;
-//             // burger.scale.set(3,3,3);
-//             burger.rotation.set(-Math.PI/2,0,0);
-//             resolve();
-//         }, (xhr) => {
-//             console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-//         }, (error) => {
-//             console.log( 'An error happened', error );
-//             reject();
-//         });
-//     });
-// }).then(() => {
-//     var coinPromise = new Promise((resolve, reject) => {
-//         mtlLoader.setPath('coin/');
-//         mtlLoader.load('CHAHIN_COIN.mtl', function(materials) {
-//             materials.preload();
-//             loader.setMaterials(materials.materials);
-//             loader.setPath( 'coin/' );
-//             loader.load('CHAHIN_COIN.obj', (obj) => {
-//                 coin = obj;
-//                 coin.scale.set(100,100,100);
-//                 //coin.rotation.set(-Math.PI/2,0,0);
-//                 resolve();
-//             }, (xhr) => {
-//                 console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-//             }, (error) => {
-//                 console.log( 'An error happened', error );
-//                 reject();
-//             });
-            
-//         });
-//     });
-// });
-
-// Promise.all([burgerPromise, coinPromise]).then(() => {
-
-//     burger.children[0].material[0].needsUpdate = true;
-//     burger.children[0].material[1].needsUpdate = true;
-//     coin.children[0].material.needsUpdate = true;
-    
-// })
 
 let i = -1;
 
