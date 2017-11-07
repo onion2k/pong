@@ -23,7 +23,6 @@ let mtlLoader = new MTLLoader(DefaultLoadingManager);
 import { OBJLoader2 } from "./OBJLoader2";
 let loader = new OBJLoader2(DefaultLoadingManager);
 
-
 // import Peer from 'peerjs';
 
 // let conn;
@@ -90,6 +89,7 @@ let posts = [];
 let lightHandle;
 let burger;
 let coin;
+let moon;
 
 function init() {
 
@@ -248,7 +248,8 @@ function animate() {
         }
     });
 
-    coin.rotation.z += 0.1;
+    coin.rotation.y += 0.01;
+    moon.rotation.y += 0.01;
 
     render3D();
     requestAnimationFrame( animate );
@@ -270,52 +271,96 @@ function render3D() {
 }
 
 
-var burgerPromise = new Promise((resolve, reject) => {
-    mtlLoader.setPath('burger/');
-    mtlLoader.load('Hamburger.mtl', function(materials) {
-        materials.preload();
-        loader.setMaterials(materials.materials);
-        loader.setPath( 'burger/' );
-        loader.load('Hamburger.obj', (obj) => {
-            burger = obj;
-            // burger.scale.set(3,3,3);
-            burger.rotation.set(-Math.PI/2,0,0);
-            resolve();
-        }, (xhr) => {
-            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-        }, (error) => {
-            console.log( 'An error happened', error );
-            reject();
-        });
-    });
-}).then(() => {
-    var coinPromise = new Promise((resolve, reject) => {
-        mtlLoader.setPath('coin/');
-        mtlLoader.load('CHAHIN_COIN.mtl', function(materials) {
+
+function loadModel(model) {
+
+    return new Promise((resolve, reject) => {
+        mtlLoader.setPath(model.path);
+        mtlLoader.load(model.material, function(materials) {
             materials.preload();
             loader.setMaterials(materials.materials);
-            loader.setPath( 'coin/' );
-            loader.load('CHAHIN_COIN.obj', (obj) => {
-                coin = obj;
-                coin.scale.set(100,100,100);
-                //coin.rotation.set(-Math.PI/2,0,0);
-                resolve();
+            loader.setPath(model.path);
+            loader.load(model.model, (obj) => {
+                obj.rotation.set(-Math.PI/2,0,0);
+                resolve({ id: model.id, object: obj });
             }, (xhr) => {
                 console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
             }, (error) => {
                 console.log( 'An error happened', error );
                 reject();
             });
-            
         });
     });
-});
 
-DefaultLoadingManager.onLoad = function() {
+}
+
+const models = [
+    { id: 'burger', path: 'burger/', model: 'Hamburger.obj', material: 'Hamburger.mtl' },
+    { id: 'coin', path: 'coin/', model: 'CHAHIN_COIN.obj', material: 'CHAHIN_COIN.mtl' },
+    { id: 'moon', path: 'moon/', model: 'PUSHILIN_moon.obj', material: 'PUSHILIN_moon.mtl' },
+]
+
+const concat = list => Array.prototype.concat.bind(list)
+const promiseConcat = f => x => f().then(concat(x))
+const promiseReduce = (acc, x) => acc.then(promiseConcat(x))
+const serial = funcs => funcs.reduce(promiseReduce, Promise.resolve([]))
+const funcs = models.map(model => () => loadModel(model));
+
+serial(funcs).then((result) => {
+    burger = result[0].object;
+    coin = result[1].object;
+    moon = result[2].object;
+    burger.scale.set(3,3,3);
+    coin.scale.set(100,100,100);
+    moon.scale.set(100,100,100);
+    moon.position.set(200,-200,-100)
     init();
     animate();
-    scene.add(coin)
-}
+    scene.add(coin);
+    scene.add(moon);
+});
+
+
+// var burgerPromise = new Promise((resolve, reject) => {
+//     mtlLoader.setPath('burger/');
+//     mtlLoader.load('Hamburger.mtl', function(materials) {
+//         materials.preload();
+//         loader.setMaterials(materials.materials);
+//         loader.setPath( 'burger/' );
+//         loader.load('Hamburger.obj', (obj) => {
+//             burger = obj;
+//             // burger.scale.set(3,3,3);
+//             burger.rotation.set(-Math.PI/2,0,0);
+//             resolve();
+//         }, (xhr) => {
+//             console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+//         }, (error) => {
+//             console.log( 'An error happened', error );
+//             reject();
+//         });
+//     });
+// }).then(() => {
+//     var coinPromise = new Promise((resolve, reject) => {
+//         mtlLoader.setPath('coin/');
+//         mtlLoader.load('CHAHIN_COIN.mtl', function(materials) {
+//             materials.preload();
+//             loader.setMaterials(materials.materials);
+//             loader.setPath( 'coin/' );
+//             loader.load('CHAHIN_COIN.obj', (obj) => {
+//                 coin = obj;
+//                 coin.scale.set(100,100,100);
+//                 //coin.rotation.set(-Math.PI/2,0,0);
+//                 resolve();
+//             }, (xhr) => {
+//                 console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+//             }, (error) => {
+//                 console.log( 'An error happened', error );
+//                 reject();
+//             });
+            
+//         });
+//     });
+// });
 
 // Promise.all([burgerPromise, coinPromise]).then(() => {
 
