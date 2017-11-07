@@ -89,7 +89,7 @@ let posts = [];
 let lightHandle;
 let burger;
 let coin;
-let moon;
+let moonHandle;
 
 function init() {
 
@@ -249,7 +249,7 @@ function animate() {
     });
 
     coin.rotation.y += 0.01;
-    moon.rotation.y += 0.01;
+    moonHandle.rotation.y += 0.01;
 
     render3D();
     requestAnimationFrame( animate );
@@ -298,6 +298,8 @@ const models = [
     { id: 'burger', path: 'burger/', model: 'Hamburger.obj', material: 'Hamburger.mtl' },
     { id: 'coin', path: 'coin/', model: 'CHAHIN_COIN.obj', material: 'CHAHIN_COIN.mtl' },
     { id: 'moon', path: 'moon/', model: 'PUSHILIN_moon.obj', material: 'PUSHILIN_moon.mtl' },
+    { id: 'guide', path: 'guide/', model: 'RCL01RemoteGuidanceUnit.obj', material: 'RCL01RemoteGuidanceUnit.mtl' },
+    { id: 'roomba', path: 'roomba/', model: 'Domestic Robot.obj', material: 'Domestic Robot.mtl' },
 ]
 
 //need to understand this better
@@ -308,17 +310,20 @@ const serial = funcs => funcs.reduce(promiseReduce, Promise.resolve([]));
 const funcs = models.map(model => () => loadModel(model));
 
 serial(funcs).then((result) => {
-    burger = result[0].object;
+
+    burger = result[3].object;
+
     coin = result[1].object;
-    moon = result[2].object;
-    burger.scale.set(3,3,3);
+    let moon = result[2].object;
+    moonHandle = new Object3D();
     coin.scale.set(100,100,100);
     moon.scale.set(100,100,100);
-    moon.position.set(200,-200,-100)
+    moon.position.set(200,-200,-400);
+    moonHandle.add(moon);
     init();
     animate();
     scene.add(coin);
-    scene.add(moon);
+    scene.add(moonHandle);
 });
 
 

@@ -24,7 +24,7 @@ if (1) {
 
 camera.position.x = 0;
 camera.position.y = 0;
-camera.position.z = -600;
+camera.position.z = -800;
 
 cameraTarget.add(camera);
 camera.lookAt(cameraTarget.position);
