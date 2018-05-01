@@ -253,14 +253,6 @@ function animate() {
 
 }
 
-setTimeout(function(){
-
-    pucks.forEach((puck)=>{
-        Matter.Body.applyForce(puck.phys, puck.phys.position, { x: Math.random() * 0.001, y: 0.01 });
-    });
-
-}, 500);
-
 function render3D() {
 
     renderer.render( scene, camera.camera );
@@ -308,16 +300,23 @@ const serial = funcs => funcs.reduce(promiseReduce, Promise.resolve([]));
 const funcs = models.map(model => () => loadModel(model));
 
 serial(funcs).then((result) => {
-    burger = result[0].object;
-    coin = result[1].object;
-    // let moon = result[2].object;
-    // moonHandle = new Object3D();
-    // moon.position.set(200,-200,-400);
-    // moonHandle.add(moon);
-    init();
-    animate();
-    scene.add(coin);
-    // scene.add(moonHandle);
+  burger = result[0].object;
+  coin = result[1].object;
+  // let moon = result[2].object;
+  // moonHandle = new Object3D();
+  // moon.position.set(200,-200,-400);
+  // moonHandle.add(moon);
+  init();
+  animate();
+  scene.add(coin);
+  // scene.add(moonHandle);
+
+  setTimeout(function(){
+    pucks.forEach((puck)=>{
+        Matter.Body.applyForce(puck.phys, puck.phys.position, { x: Math.random() * 0.001, y: 0.01 });
+    });
+  }, 500);
+
 });
 
 let i = -1;
