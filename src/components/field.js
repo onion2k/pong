@@ -3,7 +3,7 @@ import { CylinderBufferGeometry } from '../../node_modules/three/src/geometries/
 import { MeshPhysicalMaterial } from '../../node_modules/three/src/materials/MeshPhysicalMaterial';
 
 const fieldCol = new MeshPhysicalMaterial({ color: "#C5E3BF", roughness: 1 });
-const fieldGeo = new CylinderBufferGeometry(400,400,30,64);
+const fieldGeo = new CylinderBufferGeometry(600,600,30,64);
 const fieldMesh = new Mesh( fieldGeo, fieldCol );
 
 fieldMesh.castShadow = false; //default is false

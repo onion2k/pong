@@ -15,7 +15,7 @@ import settings from './components/settings';
 import initplayer from './components/player';
 import field from './components/field';
 import puck from './components/puck';
-import { arenapost, arenawall } from './components/arena';
+import { arenapost, arenawall, sensorwall } from './components/arena';
 
 import { MTLLoader } from "./MTLLoader";
 let mtlLoader = new MTLLoader(DefaultLoadingManager);
@@ -76,13 +76,14 @@ const game = {
     timeStep: 1/60,
     debug: false,
     playerId: 0,
-    arenaSize: 50*settings.players
+    arenaSize: 50 * settings.players
 }
 
 var playerVelocity = { x: 0, y: 0};
 let world, engine, scene, player, render;
 let pucks = [];
 let posts = [];
+let coins = [];
 let lightHandle;
 let burger;
 let coin;
@@ -131,6 +132,8 @@ function init() {
     scene.add(post.mesh);
     World.add(engine.world, post.phys);
 
+    /** Central posts */
+        
     for (var x=0;x<16;x++) {
         var px = x%4;
         var py = Math.floor(x/4);
@@ -144,7 +147,26 @@ function init() {
         var w = World.add(engine.world, post.phys);    
     });
 
+    /** Walls */
+
     for (var x=0; x<settings.players; x++) {
+
+      if (x===0) {
+
+        //wall as a sensor
+        var wall = new sensorwall();
+
+        var wallMesh = wall.mesh;
+        wallMesh.rotation.set(0,0,((2*Math.PI)/settings.players) * x);
+        wallMesh.translateY(50*settings.players);
+        scene.add(wallMesh);
+
+        var wallPhys = wall.phys;
+        World.add(engine.world, wallPhys);
+        Matter.Body.setPosition(wallPhys, { x: wallMesh.position.x, y: wallMesh.position.y });
+        Matter.Body.setAngle(wallPhys, wallMesh.rotation.z);
+
+      } else {
 
         var wall = new arenawall();
 
@@ -157,6 +179,7 @@ function init() {
         World.add(engine.world, wallPhys);
         Matter.Body.setPosition(wallPhys, { x: wallMesh.position.x, y: wallMesh.position.y });
         Matter.Body.setAngle(wallPhys, wallMesh.rotation.z);
+      }
 
     }
 
@@ -245,7 +268,9 @@ function animate() {
         }
     });
 
-    coin.rotation.y += 0.01;
+    coins.forEach((coin)=>{
+      coin.rotation.z += 0.05;
+    });
     // moonHandle.rotation.y += 0.01;
 
     render3D();
@@ -308,7 +333,13 @@ serial(funcs).then((result) => {
   // moonHandle.add(moon);
   init();
   animate();
-  scene.add(coin);
+  for (let x = 0; x < 10; x++) {
+    let c = coin.clone();
+    c.position.x = 300 - Math.random() * 600;
+    c.position.y = 300 - Math.random() * 600;
+    scene.add(c);
+    coins.push(c)
+  }
   // scene.add(moonHandle);
 
   setTimeout(function(){

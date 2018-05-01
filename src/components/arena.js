@@ -10,6 +10,7 @@ let walls = 0;
 
 const postCol = new MeshPhysicalMaterial({ color: "#AAFFFF", roughness: 1 });
 const wallCol = new MeshPhysicalMaterial({ color: "#FFAAAA", roughness: 1 });
+const sensorCol = new MeshPhysicalMaterial({ color: "#FFFFAA", roughness: 0 });
 
 function arenapost(x, y){
 
@@ -51,4 +52,21 @@ function arenawall(){
         
 }
 
-export { arenapost, arenawall };
+function sensorwall(){
+
+  const length = 400;
+  const width = 10;
+
+  const wallGeo = new BoxBufferGeometry(length,width,30);
+  const wallMesh = new Mesh( wallGeo, sensorCol );
+
+  wallMesh.castShadow = false; //default is false
+  wallMesh.receiveShadow = false; //default
+
+  const wallPhys = Matter.Bodies.rectangle(0, 0, length, width, {isStatic: true });
+  
+  return { mesh: wallMesh, phys: wallPhys };
+
+}
+
+export { arenapost, arenawall, sensorwall };

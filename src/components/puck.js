@@ -29,5 +29,4 @@ function puck(mesh) {
     return { mesh: mesh, phys: ball, id: id };
 }
 
-
 export default puck;
