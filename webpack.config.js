@@ -42,6 +42,9 @@ module.exports = {
         //     hashFuncNames: ['sha256', 'sha384'],
         //     enabled: true
         // }),
+        new CopyWebpackPlugin([
+          { from: 'assets' }
+        ]),
         new HtmlWebpackPlugin(),
         new ExtractTextPlugin("pixelheart.css"),
     ]

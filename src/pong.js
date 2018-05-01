@@ -62,9 +62,6 @@ let loader = new OBJLoader2(DefaultLoadingManager);
 
 // });
 
-
-
-
 import renderer from './components/render';
 import camera from './components/camera';
 
@@ -89,7 +86,7 @@ let posts = [];
 let lightHandle;
 let burger;
 let coin;
-let moonHandle;
+// let moonHandle;
 
 function init() {
 
@@ -249,7 +246,7 @@ function animate() {
     });
 
     coin.rotation.y += 0.01;
-    moonHandle.rotation.y += 0.01;
+    // moonHandle.rotation.y += 0.01;
 
     render3D();
     requestAnimationFrame( animate );
@@ -298,9 +295,9 @@ function loadModel(model) {
 const models = [
     { id: 'burger', path: 'burger/', model: 'Hamburger.obj', material: 'Hamburger.mtl', scale: 5, rotation: {x:-Math.PI/2, y:0, z:0} },
     { id: 'coin', path: 'coin/', model: 'CHAHIN_COIN.obj', material: 'CHAHIN_COIN.mtl', scale: 100, rotation: {x:0, y:0, z:0} },
-    { id: 'moon', path: 'moon/', model: 'PUSHILIN_moon.obj', material: 'PUSHILIN_moon.mtl', scale: 100, rotation: {x:-Math.PI/2, y:0, z:0} },
-    { id: 'guide', path: 'guide/', model: 'RCL01RemoteGuidanceUnit.obj', material: 'RCL01RemoteGuidanceUnit.mtl', scale: 5, rotation: {x:-Math.PI/2, y:0, z:0} },
-    { id: 'roomba', path: 'roomba/', model: 'Domestic Robot.obj', material: 'Domestic Robot.mtl', scale: 5, rotation: {x:-Math.PI/2, y:0, z:0} },
+    // { id: 'moon', path: 'moon/', model: 'PUSHILIN_moon.obj', material: 'PUSHILIN_moon.mtl', scale: 100, rotation: {x:-Math.PI/2, y:0, z:0} },
+    // { id: 'guide', path: 'guide/', model: 'RCL01RemoteGuidanceUnit.obj', material: 'RCL01RemoteGuidanceUnit.mtl', scale: 5, rotation: {x:-Math.PI/2, y:0, z:0} },
+    // { id: 'roomba', path: 'roomba/', model: 'Domestic Robot.obj', material: 'Domestic Robot.mtl', scale: 5, rotation: {x:-Math.PI/2, y:0, z:0} },
 ]
 
 //need to understand this better
@@ -311,20 +308,17 @@ const serial = funcs => funcs.reduce(promiseReduce, Promise.resolve([]));
 const funcs = models.map(model => () => loadModel(model));
 
 serial(funcs).then((result) => {
-
     burger = result[0].object;
-
     coin = result[1].object;
-    let moon = result[2].object;
-    moonHandle = new Object3D();
-    moon.position.set(200,-200,-400);
-    moonHandle.add(moon);
+    // let moon = result[2].object;
+    // moonHandle = new Object3D();
+    // moon.position.set(200,-200,-400);
+    // moonHandle.add(moon);
     init();
     animate();
     scene.add(coin);
-    scene.add(moonHandle);
+    // scene.add(moonHandle);
 });
-
 
 let i = -1;
 
